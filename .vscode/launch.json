@@ -1,0 +1,74 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // ── API ──────────────────────────────────────────────────────────
+    {
+      // Starts the Functions host via the task above, then attaches the .NET
+      // debugger to the dotnet worker process spawned by func.
+      "name": "Api: Attach Debugger",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:azureFunctions.pickProcess}",
+      "preLaunchTask": "api: func host start",
+      "presentation": {
+        "hidden": false,
+        "group": "1 - Api",
+        "order": 1
+      }
+    },
+
+    // ── Client ───────────────────────────────────────────────────────
+    {
+      // Opens a terminal running `astro dev`.  preLaunchTask ensures the
+      // Astro dev server is actually up before VS Code considers this launched.
+      "name": "Client: Astro Dev Server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/Client",
+      "preLaunchTask": "client: astro dev",
+      "presentation": {
+        "hidden": false,
+        "group": "2 - Client",
+        "order": 1
+      }
+    },
+
+    // ── SWA Emulator (optional, replaces opening browser on 4321) ───
+    {
+      // Convenience config that starts the full stack through the SWA CLI
+      // emulator on http://localhost:4280, proxying both the Astro dev server
+      // (4321) and the Functions host (7071) automatically.
+      "name": "SWA: Emulator (Full Stack)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npx swa start app",
+      "cwd": "${workspaceFolder}/Client",
+      "preLaunchTask": "client: astro dev",
+      "presentation": {
+        "hidden": false,
+        "group": "3 - SWA",
+        "order": 1
+      }
+    }
+  ],
+
+  "compounds": [
+    {
+      // Recommended entry point for daily development.
+      // Execution order is enforced by task dependencies:
+      //   api: restore → api: build → api: func host start
+      //                                        ↓
+      //                              client: astro dev
+      // Both debug sessions attach once their respective processes are live.
+      "name": "Full Stack (Api → Client)",
+      "configurations": ["Api: Attach Debugger", "Client: Astro Dev Server"],
+      "stopAll": true,
+      "presentation": {
+        "hidden": false,
+        "group": "0 - Full Stack",
+        "order": 1
+      }
+    }
+  ]
+}
