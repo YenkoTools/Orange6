@@ -111,13 +111,13 @@ jobs:
 
     steps:
       - name: Download Client artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: client-dist
           path: deploy/app
 
       - name: Download API artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: api-publish
           path: deploy/api
