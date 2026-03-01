@@ -4,22 +4,19 @@ updates:
     directory: "/Client"
     schedule:
       interval: "weekly"
-    labels:
-      - "dependencies"
-      - "javascript"
+    commit-message:
+      prefix: "deps:"
 
   - package-ecosystem: "nuget"
     directory: "/Api"
     schedule:
       interval: "weekly"
-    labels:
-      - "dependencies"
-      - "dotnet"
+    commit-message:
+      prefix: "deps:"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    labels:
-      - "dependencies"
-      - "github-actions"
+    commit-message:
+      prefix: "deps:"
