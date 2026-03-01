@@ -1,4 +1,9 @@
-# Orange6
+<a href="https://github.com/jkulba/Orange6/">
+    <img alt="The Orange Service" src="https://github.com/jkulba/Orange/blob/main/orange6.png"
+    width="150" height="175">
+</a>
+
+# The Orange6 Client and Service
 
 Orange6 is a full-stack web application consisting of an Azure Functions API backend and an Astro-based frontend client, designed to be hosted on Azure Static Web Apps.
 
