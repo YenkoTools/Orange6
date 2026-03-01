@@ -1,10 +1,7 @@
 {
   "version": "0.2.0",
   "configurations": [
-    // ── API ──────────────────────────────────────────────────────────
     {
-      // Starts the Functions host via the task above, then attaches the .NET
-      // debugger to the dotnet worker process spawned by func.
       "name": "Api: Attach Debugger",
       "type": "coreclr",
       "request": "attach",
@@ -16,11 +13,7 @@
         "order": 1
       }
     },
-
-    // ── Client ───────────────────────────────────────────────────────
     {
-      // Opens a terminal running `astro dev`.  preLaunchTask ensures the
-      // Astro dev server is actually up before VS Code considers this launched.
       "name": "Client: Astro Dev Server",
       "type": "node-terminal",
       "request": "launch",
@@ -33,12 +26,7 @@
         "order": 1
       }
     },
-
-    // ── SWA Emulator (optional, replaces opening browser on 4321) ───
     {
-      // Convenience config that starts the full stack through the SWA CLI
-      // emulator on http://localhost:4280, proxying both the Astro dev server
-      // (4321) and the Functions host (7071) automatically.
       "name": "SWA: Emulator (Full Stack)",
       "type": "node-terminal",
       "request": "launch",
@@ -50,6 +38,12 @@
         "group": "3 - SWA",
         "order": 1
       }
+    },
+    {
+      "name": "Attach to .NET Functions",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:azureFunctions.pickProcess}"
     }
   ],
 
