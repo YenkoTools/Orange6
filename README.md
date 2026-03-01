@@ -1,4 +1,9 @@
-# Orange6
+<a href="https://github.com/jkulba/Orange6/">
+    <img alt="The Orange Service" src="https://github.com/jkulba/Orange/blob/main/Orange6.png"
+    width="150" height="175">
+</a>
+
+# The Orange6 Client and Service
 
 Orange6 is a full-stack web application consisting of an Azure Functions API backend and an Astro-based frontend client, designed to be hosted on Azure Static Web Apps.
 
@@ -46,9 +51,49 @@ The `Client` project is a static frontend built with [Astro 5](https://astro.bui
 ## Prerequisites
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
-- [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local)
 - [Node.js 20+](https://nodejs.org) and npm
-- [Azure Static Web Apps CLI](https://azure.github.io/static-web-apps-cli/) (`npm install -g @azure/static-web-apps-cli`)
+
+### Install Azure Functions Core Tools
+
+The Azure Functions Core Tools provide a local development experience for creating, running, and deploying Azure Functions.
+
+**macOS (Homebrew):**
+```bash
+brew tap azure/functions
+brew install azure-functions-core-tools@4
+```
+
+**Linux (APT):**
+```bash
+curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
+sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-$(lsb_release -cs)-prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/dotnetdev.list'
+sudo apt-get update
+sudo apt-get install azure-functions-core-tools-4
+```
+
+**Windows (npm):**
+```bash
+npm install -g azure-functions-core-tools@4 --unsafe-perm true
+```
+
+Verify the installation:
+```bash
+func --version
+```
+
+### Install Azure Static Web Apps CLI
+
+The SWA CLI provides a local development server that emulates the Azure Static Web Apps environment, proxying requests between the client and the API.
+
+```bash
+npm install -g @azure/static-web-apps-cli
+```
+
+Verify the installation:
+```bash
+swa --version
+```
 
 ---
 
