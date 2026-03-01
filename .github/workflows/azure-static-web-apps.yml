@@ -1,4 +1,4 @@
-name: Azure Static Web Apps – Build, Test & Deploy
+name: Build, Test & Deploy
 
 # On-demand only.  Run from the Actions tab → "Run workflow".
 on:
