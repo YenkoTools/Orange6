@@ -1,5 +1,5 @@
 <a href="https://github.com/jkulba/Orange6/">
-    <img alt="The Orange Service" src="https://github.com/jkulba/Orange/blob/main/Orange6.png"
+    <img alt="The Orange Service" src="https://github.com/jkulba/Orange6/blob/main/orange6.png"
     width="150" height="175">
 </a>
 
