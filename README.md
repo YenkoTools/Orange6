@@ -125,9 +125,6 @@ dotnet publish Api/Api.csproj --configuration Release --output publish/api
 cd Client
 npm install
 
-# Type-check (Astro + TypeScript)
-npx astro check
-
 # Build for production — outputs to Client/dist
 npm run build
 
