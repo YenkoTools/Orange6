@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
-using Orange6.Application.Abstractions;
+using Application.Abstractions;
 using System.Diagnostics;
 
-namespace Orange6.Application.Behaviors;
+namespace Application.Behaviors;
 
 /// <summary>
 /// Pipeline behavior that monitors performance and logs warnings for slow-running commands.

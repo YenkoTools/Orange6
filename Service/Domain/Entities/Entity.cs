@@ -1,4 +1,4 @@
-namespace Orange6.Domain.Entities;
+namespace Domain.Entities;
 
 /// <summary>
 /// Base class for all entities in the domain.

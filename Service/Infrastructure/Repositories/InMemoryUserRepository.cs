@@ -1,9 +1,9 @@
-using Orange6.Application.Interfaces;
-using Orange6.Domain.Common;
-using Orange6.Domain.Entities;
+using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
 using System.Linq.Expressions;
 
-namespace Orange6.Infrastructure.Repositories;
+namespace Infrastructure.Repositories;
 
 /// <summary>
 /// In-memory implementation of IUserRepository for development and testing.

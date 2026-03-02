@@ -1,4 +1,4 @@
-namespace Orange6.Domain.Common;
+namespace Domain.Common;
 
 /// <summary>
 /// Represents an error with a code and description.

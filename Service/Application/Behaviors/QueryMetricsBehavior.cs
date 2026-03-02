@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
-using Orange6.Application.Abstractions;
+using Application.Abstractions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
-namespace Orange6.Application.Behaviors;
+namespace Application.Behaviors;
 
 /// <summary>
 /// Pipeline behavior that collects business metrics for queries.

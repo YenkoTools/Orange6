@@ -1,10 +1,10 @@
-using Orange6.Application.Abstractions;
-using Orange6.Application.Interfaces;
-using Orange6.Domain.Common;
-using Orange6.Domain.Entities;
-using Orange6.Domain.Errors;
+using Application.Abstractions;
+using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
+using Domain.Errors;
 
-namespace Orange6.Application.Features.Users.Queries;
+namespace Application.Features.Users.Queries;
 
 /// <summary>
 /// Handles the GetUsersQuery to retrieve paginated users.

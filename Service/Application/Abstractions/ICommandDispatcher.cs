@@ -1,4 +1,4 @@
-namespace Orange6.Application.Abstractions;
+namespace Application.Abstractions;
 
 public interface ICommandDispatcher
 {

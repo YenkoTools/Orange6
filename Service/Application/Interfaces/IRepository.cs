@@ -1,8 +1,8 @@
-using Orange6.Domain.Common;
-using Orange6.Domain.Entities;
+using Domain.Common;
+using Domain.Entities;
 using System.Linq.Expressions;
 
-namespace Orange6.Application.Interfaces;
+namespace Application.Interfaces;
 
 /// <summary>
 /// Defines the contract for a generic repository.

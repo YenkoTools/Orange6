@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
-using Orange6.Application.Abstractions;
+using Application.Abstractions;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
-namespace Orange6.Application.Behaviors;
+namespace Application.Behaviors;
 
 /// <summary>
 /// Pipeline behavior that collects business metrics for commands.
@@ -117,7 +117,7 @@ public class CommandMetricsBehavior<TCommand, TCommandResult> : ICommandPipeline
     {
         var type = result.GetType();
 
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Orange6.Domain.Common.Result<>))
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Domain.Common.Result<>))
         {
             var prop = type.GetProperty("IsSuccess");
             return (bool)(prop?.GetValue(result) ?? false);

@@ -1,8 +1,8 @@
 using FluentValidation;
 using Microsoft.Extensions.Logging;
-using Orange6.Application.Abstractions;
+using Application.Abstractions;
 
-namespace Orange6.Application.Behaviors;
+namespace Application.Behaviors;
 
 /// <summary>
 /// Pipeline behavior that validates commands using FluentValidation before processing.

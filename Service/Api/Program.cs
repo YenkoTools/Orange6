@@ -6,16 +6,16 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Orange6.Application.Abstractions;
-using Orange6.Application.Behaviors;
-using Orange6.Application.Dispatching;
-using Orange6.Application.Features.Users.Commands;
-using Orange6.Application.Features.Users.Queries;
-using Orange6.Application.Interfaces;
-using Orange6.Domain.Common;
-using Orange6.Domain.Entities;
-using Orange6.Infrastructure.Repositories;
-using Orange6.Infrastructure.Services;
+using Application.Abstractions;
+using Application.Behaviors;
+using Application.Dispatching;
+using Application.Features.Users.Commands;
+using Application.Features.Users.Queries;
+using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 

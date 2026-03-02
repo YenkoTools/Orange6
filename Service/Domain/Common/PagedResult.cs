@@ -1,4 +1,4 @@
-namespace Orange6.Domain.Common;
+namespace Domain.Common;
 
 /// <summary>
 /// Represents a paginated result containing items and pagination metadata.

@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Orange6.Domain.Common;
+namespace Domain.Common;
 
 /// <summary>
 /// Represents the result of an operation.

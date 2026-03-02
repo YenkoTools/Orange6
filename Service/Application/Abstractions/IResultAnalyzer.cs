@@ -1,4 +1,4 @@
-namespace Orange6.Application.Abstractions;
+namespace Application.Abstractions;
 
 /// <summary>
 /// Analyzes a query result and extracts structured information about it.

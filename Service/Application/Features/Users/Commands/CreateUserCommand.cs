@@ -1,4 +1,4 @@
-namespace Orange6.Application.Features.Users.Commands;
+namespace Application.Features.Users.Commands;
 
 /// <summary>
 /// Represents a command to create a new user in the system.

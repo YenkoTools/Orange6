@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Orange6.Application.Abstractions;
+using Application.Abstractions;
 
-namespace Orange6.Application.Dispatching;
+namespace Application.Dispatching;
 
 /// <summary>
 /// Dispatcher for queries that supports pipeline behaviors for cross-cutting concerns.

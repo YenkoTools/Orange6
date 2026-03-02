@@ -1,6 +1,6 @@
-using Orange6.Domain.Common;
+using Domain.Common;
 
-namespace Orange6.Domain.Errors;
+namespace Domain.Errors;
 
 public static class UserErrors
 {

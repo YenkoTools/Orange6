@@ -1,4 +1,4 @@
-namespace Orange6.Application.Abstractions;
+namespace Application.Abstractions;
 
 /// <summary>
 /// Service for recording business metrics and operational telemetry.

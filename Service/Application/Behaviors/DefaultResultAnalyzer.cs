@@ -1,7 +1,7 @@
-using Orange6.Application.Abstractions;
-using Orange6.Domain.Common;
+using Application.Abstractions;
+using Domain.Common;
 
-namespace Orange6.Application.Behaviors;
+namespace Application.Behaviors;
 
 /// <summary>
 /// Default implementation of IResultAnalyzer that uses reflection to inspect result objects.

@@ -1,9 +1,9 @@
-using Orange6.Application.Abstractions;
-using Orange6.Application.Interfaces;
-using Orange6.Domain.Common;
-using Orange6.Domain.Entities;
+using Application.Abstractions;
+using Application.Interfaces;
+using Domain.Common;
+using Domain.Entities;
 
-namespace Orange6.Application.Features.Users.Commands;
+namespace Application.Features.Users.Commands;
 
 /// <summary>
 /// Handles the creation of a new user.

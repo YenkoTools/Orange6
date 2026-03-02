@@ -1,4 +1,4 @@
-namespace Orange6.Domain.Entities;
+namespace Domain.Entities;
 
 /// <summary>
 /// Represents a user in the system.

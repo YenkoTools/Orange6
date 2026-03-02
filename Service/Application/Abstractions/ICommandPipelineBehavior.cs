@@ -1,4 +1,4 @@
-namespace Orange6.Application.Abstractions;
+namespace Application.Abstractions;
 
 /// <summary>
 /// Represents a pipeline behavior that can intercept and process commands.

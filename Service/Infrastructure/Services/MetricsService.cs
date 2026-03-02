@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
-using Orange6.Application.Abstractions;
+using Application.Abstractions;
 
-namespace Orange6.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 /// <summary>
 /// Default implementation of IMetricsService that logs metrics at Debug level.
