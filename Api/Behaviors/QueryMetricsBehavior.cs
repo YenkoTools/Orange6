@@ -1,7 +1,6 @@
 using Api.Common;
 using Api.Domain.Common;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry.Trace;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.Reflection;
@@ -180,7 +179,11 @@ public class QueryMetricsBehavior<TQuery, TQueryResult> : IQueryPipelineBehavior
         QueryExceptions.Add(1, metricTags);
 
         activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-        activity?.AddException(ex);
+        activity?.AddEvent(new ActivityEvent("exception", tags: new ActivityTagsCollection
+        {
+            { "exception.type", ex.GetType().FullName },
+            { "exception.message", ex.Message }
+        }));
 
         _logger.LogWarning("BUSINESS_METRIC: Query {QueryName} threw {ExceptionType}",
             queryName, ex.GetType().Name);

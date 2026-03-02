@@ -124,7 +124,11 @@ public class CommandMetricsBehavior<TCommand, TCommandResult> : ICommandPipeline
 
             // Record exception in activity
             activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-            activity?.AddException(ex);
+            activity?.AddEvent(new ActivityEvent("exception", tags: new ActivityTagsCollection
+            {
+                { "exception.type", ex.GetType().FullName },
+                { "exception.message", ex.Message }
+            }));
 
             _logger.LogWarning("BUSINESS_METRIC: Command {CommandName} threw {ExceptionType}",
                 commandName, ex.GetType().Name);
