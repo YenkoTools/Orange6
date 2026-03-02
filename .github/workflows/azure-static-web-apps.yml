@@ -1,4 +1,4 @@
-name: Azure Static Web Apps – Build, Test & Deploy
+name: Build, Test & Deploy
 
 # On-demand only.  Run from the Actions tab → "Run workflow".
 on:
@@ -25,10 +25,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: "8.0.x"
 
@@ -60,7 +60,7 @@ jobs:
             --output "${{ github.workspace }}/publish/api"
 
       - name: Upload API artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-publish
           path: publish/api
@@ -73,10 +73,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js 20
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
           cache: npm
@@ -96,7 +96,7 @@ jobs:
         working-directory: Client
 
       - name: Upload Client artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: client-dist
           path: Client/dist
@@ -111,13 +111,13 @@ jobs:
 
     steps:
       - name: Download Client artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: client-dist
           path: deploy/app
 
       - name: Download API artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: api-publish
           path: deploy/api
