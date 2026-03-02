@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api;
+namespace Api.Endpoints;
 
 public class VersionFunction
 {
