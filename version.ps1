@@ -56,7 +56,7 @@ $JSON = @{
 } | ConvertTo-Json -Depth 10 -Compress
 
 # Write version.json to Api
-$OUTPUT_PATH = Join-Path -Path $SCRIPT_DIR -ChildPath "Api/version.json"
+$OUTPUT_PATH = Join-Path -Path $SCRIPT_DIR -ChildPath "Service/Api/version.json"
 New-Item -ItemType Directory -Path (Split-Path -Parent $OUTPUT_PATH) -Force | Out-Null
 $JSON | Set-Content -Path $OUTPUT_PATH -Encoding UTF8
 Write-Host "✅ version.json written to $OUTPUT_PATH"

@@ -4,7 +4,7 @@
     {
       "label": "api: restore",
       "type": "shell",
-      "command": "dotnet restore ${workspaceFolder}/Api/Api.csproj",
+      "command": "dotnet restore ${workspaceFolder}/Service/Api/Api.csproj",
       "problemMatcher": "$msCompile",
       "group": "build",
       "presentation": {
@@ -15,7 +15,7 @@
     {
       "label": "api: build",
       "type": "shell",
-      "command": "dotnet build ${workspaceFolder}/Api/Api.csproj /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary",
+      "command": "dotnet build ${workspaceFolder}/Service/Api/Api.csproj /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary",
       "dependsOn": "api: restore",
       "problemMatcher": "$msCompile",
       "group": "build",
@@ -29,7 +29,7 @@
       "type": "shell",
       "command": "func host start --port 7071",
       "options": {
-        "cwd": "${workspaceFolder}/Api"
+        "cwd": "${workspaceFolder}/Service/Api"
       },
       "dependsOn": "api: build",
       "isBackground": true,
@@ -113,7 +113,7 @@
       "type": "process",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/Api"
+        "cwd": "${workspaceFolder}/Service/Api"
       }
     },
     {
@@ -132,7 +132,7 @@
       },
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/Api"
+        "cwd": "${workspaceFolder}/Service/Api"
       }
     },
     {
@@ -148,7 +148,7 @@
       "type": "process",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/Api"
+        "cwd": "${workspaceFolder}/Service/Api"
       }
     },
     {
@@ -165,14 +165,14 @@
       "dependsOn": "clean release (functions)",
       "problemMatcher": "$msCompile",
       "options": {
-        "cwd": "${workspaceFolder}/Api"
+        "cwd": "${workspaceFolder}/Service/Api"
       }
     },
     {
       "type": "func",
       "dependsOn": "build (functions)",
       "options": {
-        "cwd": "${workspaceFolder}/Api/bin/Debug/net8.0"
+        "cwd": "${workspaceFolder}/Service/Api/bin/Debug/net8.0"
       },
       "command": "host start",
       "isBackground": true,
