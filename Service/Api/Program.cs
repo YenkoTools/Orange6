@@ -1,4 +1,3 @@
-using FluentValidation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
@@ -6,16 +5,8 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Application.Abstractions;
-using Application.Behaviors;
-using Application.Dispatching;
-using Application.Features.Users.Commands;
-using Application.Features.Users.Queries;
-using Application.Interfaces;
-using Domain.Common;
-using Domain.Entities;
-using Infrastructure.Repositories;
-using Infrastructure.Services;
+using Application.Extensions;
+using Infrastructure.Extensions;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -47,33 +38,10 @@ builder.Services.AddSingleton<IOpenApiConfigurationOptions>(_ => new OpenApiConf
     ForceHttp = DefaultOpenApiConfigurationOptions.IsHttpForced(),
 });
 
-// Dispatchers
-builder.Services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-builder.Services.AddScoped<IQueryDispatcher, QueryDispatcher>();
+// Application services (dispatchers, handlers, behaviors, validators)
+builder.Services.AddApplicationServices();
 
-// Infrastructure
-builder.Services.AddSingleton<IMetricsService, MetricsService>();
-builder.Services.AddSingleton<IResultAnalyzer, DefaultResultAnalyzer>();
-builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
-
-// Command handlers
-builder.Services.AddScoped<ICommandHandler<CreateUserCommand, Result<User>>, CreateUserCommandHandler>();
-
-// Query handlers
-builder.Services.AddScoped<IQueryHandler<GetUserByIdQuery, Result<User>>, GetUserByIdQueryHandler>();
-builder.Services.AddScoped<IQueryHandler<GetUsersQuery, Result<PagedResult<User>>>, GetUsersQueryHandler>();
-
-// Command pipeline: Validation → Performance → Metrics
-builder.Services.AddScoped(typeof(ICommandPipelineBehavior<,>), typeof(CommandValidationBehavior<,>));
-builder.Services.AddScoped(typeof(ICommandPipelineBehavior<,>), typeof(CommandPerformanceBehavior<,>));
-builder.Services.AddScoped(typeof(ICommandPipelineBehavior<,>), typeof(CommandMetricsBehavior<,>));
-
-// Query pipeline: Validation → Performance → Metrics
-builder.Services.AddScoped(typeof(IQueryPipelineBehavior<,>), typeof(QueryValidationBehavior<,>));
-builder.Services.AddScoped(typeof(IQueryPipelineBehavior<,>), typeof(QueryPerformanceBehavior<,>));
-builder.Services.AddScoped(typeof(IQueryPipelineBehavior<,>), typeof(QueryMetricsBehavior<,>));
-
-// FluentValidation — register validators from Application assembly
-builder.Services.AddValidatorsFromAssembly(typeof(CreateUserCommand).Assembly);
+// Infrastructure services (repositories, metrics)
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Build().Run();
