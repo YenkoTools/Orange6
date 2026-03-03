@@ -1,0 +1,16 @@
+@baseUrl = http://localhost:7071/api
+
+### Get API Version
+GET {{baseUrl}}/version
+Accept: application/json
+
+### Create User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "username": "jdoe",
+    "email": "jdoe@example.com",
+    "firstName": "John",
+    "lastName": "Doe"
+}
