@@ -77,4 +77,69 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, ILogger<UserFun
             ? Results.Created($"/api/users/{result.Value.Id}", result.Value)
             : result.ToProblemDetails();
     }
+
+    [Function("UpdateUser")]
+    [OpenApiOperation(operationId: "UpdateUser", tags: ["Users"], Summary = "Update a user", Description = "Updates an existing user in the system. The user id is taken from the route parameter.", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(int), Description = "The unique identifier of the user to update.")]
+    [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(UpdateUserCommand), Required = true, Description = "The updated user data.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "OK", Description = "The updated user.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.BadRequest, contentType: "application/json", bodyType: typeof(HttpValidationProblemDetails), Summary = "Bad request", Description = "Validation failed or invalid input.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.NotFound, contentType: "application/json", bodyType: typeof(ProblemDetails), Summary = "Not found", Description = "The user was not found.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.InternalServerError, contentType: "application/json", bodyType: typeof(ProblemDetails), Summary = "Error", Description = "An unexpected error occurred.")]
+    public async Task<IResult> UpdateUser(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "users/{id:int}")] HttpRequest req,
+        int id,
+        CancellationToken cancellationToken)
+    {
+        logger.LogInformation("UpdateUser function processed a request.");
+
+        UpdateUserCommand? command;
+        try
+        {
+            command = await JsonSerializer.DeserializeAsync<UpdateUserCommand>(
+                req.Body,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
+                cancellationToken);
+        }
+        catch (JsonException ex)
+        {
+            logger.LogWarning(ex, "Failed to deserialize UpdateUserCommand.");
+            return Results.Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Bad Request",
+                detail: "Invalid request body.");
+        }
+
+        if (command is null)
+        {
+            return Results.Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Bad Request",
+                detail: "Request body is required.");
+        }
+
+        command = command with { Id = id };
+
+        Result<User> result;
+        try
+        {
+            result = await commandDispatcher.Dispatch<UpdateUserCommand, Result<User>>(command, cancellationToken);
+        }
+        catch (ValidationException ex)
+        {
+            var errors = ex.Errors
+                .GroupBy(f => f.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(f => f.ErrorMessage).ToArray());
+
+            logger.LogWarning("UpdateUser validation failed: {Errors}", errors);
+            return Results.ValidationProblem(errors);
+        }
+
+        logger.LogInformation("UpdateUser result: {IsSuccess}", result.IsSuccess);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : result.ToProblemDetails();
+    }
 }
