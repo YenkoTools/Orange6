@@ -142,4 +142,42 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, ILogger<UserFun
             ? Results.Ok(result.Value)
             : result.ToProblemDetails();
     }
+
+    [Function("DeleteUser")]
+    [OpenApiOperation(operationId: "DeleteUser", tags: ["Users"], Summary = "Delete a user", Description = "Deletes an existing user from the system by their unique identifier.", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(int), Description = "The unique identifier of the user to delete.")]
+    [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.NoContent, Summary = "No content", Description = "The user was successfully deleted.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.NotFound, contentType: "application/json", bodyType: typeof(ProblemDetails), Summary = "Not found", Description = "The user was not found.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.InternalServerError, contentType: "application/json", bodyType: typeof(ProblemDetails), Summary = "Error", Description = "An unexpected error occurred.")]
+    public async Task<IResult> DeleteUser(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "users/{id:int}")] HttpRequest req,
+        int id,
+        CancellationToken cancellationToken)
+    {
+        logger.LogInformation("DeleteUser function processed a request.");
+
+        var command = new DeleteUserCommand(id);
+
+        Result result;
+        try
+        {
+            result = await commandDispatcher.Dispatch<DeleteUserCommand, Result>(command, cancellationToken);
+        }
+        catch (ValidationException ex)
+        {
+            var errors = ex.Errors
+                .GroupBy(f => f.PropertyName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(f => f.ErrorMessage).ToArray());
+
+            logger.LogWarning("DeleteUser validation failed: {Errors}", errors);
+            return Results.ValidationProblem(errors);
+        }
+
+        logger.LogInformation("DeleteUser result: {IsSuccess}", result.IsSuccess);
+        return result.IsSuccess
+            ? Results.NoContent()
+            : result.ToProblemDetails();
+    }
 }
