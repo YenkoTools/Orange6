@@ -3,6 +3,7 @@ using System.Text.Json;
 using Api.Endpoints;
 using Application.Abstractions;
 using Application.Features.Users.Commands;
+using Application.Features.Users.Queries;
 using Domain.Common;
 using Domain.Entities;
 using FluentValidation;
@@ -18,14 +19,16 @@ namespace Api.Tests;
 public class UserFunctionsTests
 {
     private readonly ICommandDispatcher _commandDispatcher;
+    private readonly IQueryDispatcher _queryDispatcher;
     private readonly ILogger<UserFunctions> _logger;
     private readonly UserFunctions _sut;
 
     public UserFunctionsTests()
     {
         _commandDispatcher = Substitute.For<ICommandDispatcher>();
+        _queryDispatcher = Substitute.For<IQueryDispatcher>();
         _logger = Substitute.For<ILogger<UserFunctions>>();
-        _sut = new UserFunctions(_commandDispatcher, _logger);
+        _sut = new UserFunctions(_commandDispatcher, _queryDispatcher, _logger);
     }
 
     private static HttpRequest CreateRequestWithBody(object body)
@@ -50,6 +53,113 @@ public class UserFunctionsTests
         var context = new DefaultHttpContext();
         context.Request.Body = Stream.Null;
         return context.Request;
+    }
+
+    private static HttpRequest CreateRequestWithQueryParams(Dictionary<string, string?> queryParams)
+    {
+        var context = new DefaultHttpContext();
+        context.Request.QueryString = QueryString.Create(queryParams);
+        return context.Request;
+    }
+
+    // ── GetUsers ─────────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetUsers_ReturnsOk_WhenQuerySucceeds()
+    {
+        var users = new List<User> { new User { Id = 1, Username = "jdoe", Email = "jdoe@test.com", FirstName = "John", LastName = "Doe" } };
+        var pagedResult = new PagedResult<User>(users, 1, 10, 1);
+
+        _queryDispatcher
+            .Dispatch<GetUsersQuery, Result<PagedResult<User>>>(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result<PagedResult<User>>.Success(pagedResult));
+
+        var result = await _sut.GetUsers(CreateRequestWithQueryParams(new Dictionary<string, string?> { { "pageNumber", "1" }, { "pageSize", "10" } }), CancellationToken.None);
+
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
+        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsers_UsesDefaultPagingValues_WhenQueryParamsOmitted()
+    {
+        var users = new List<User> { new User { Id = 1, Username = "jdoe", Email = "jdoe@test.com", FirstName = "John", LastName = "Doe" } };
+        var pagedResult = new PagedResult<User>(users, 1, 10, 1);
+
+        GetUsersQuery? dispatchedQuery = null;
+        _queryDispatcher
+            .Dispatch<GetUsersQuery, Result<PagedResult<User>>>(Arg.Do<GetUsersQuery>(q => dispatchedQuery = q), Arg.Any<CancellationToken>())
+            .Returns(Result<PagedResult<User>>.Success(pagedResult));
+
+        await _sut.GetUsers(CreateEmptyRequest(), CancellationToken.None);
+
+        Assert.NotNull(dispatchedQuery);
+        Assert.Equal(1, dispatchedQuery!.PageNumber);
+        Assert.Equal(10, dispatchedQuery!.PageSize);
+    }
+
+    [Fact]
+    public async Task GetUsers_ReturnsNotFound_WhenQueryReturnsNotFound()
+    {
+        _queryDispatcher
+            .Dispatch<GetUsersQuery, Result<PagedResult<User>>>(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result<PagedResult<User>>.NotFound("Users"));
+
+        var result = await _sut.GetUsers(CreateEmptyRequest(), CancellationToken.None);
+
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
+        Assert.Equal(StatusCodes.Status404NotFound, statusResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsers_ReturnsProblem_WhenQueryFails()
+    {
+        var error = new Error("Error.InternalServerError", "Something went wrong");
+
+        _queryDispatcher
+            .Dispatch<GetUsersQuery, Result<PagedResult<User>>>(Arg.Any<GetUsersQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result<PagedResult<User>>.Failure(error));
+
+        var result = await _sut.GetUsers(CreateEmptyRequest(), CancellationToken.None);
+
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsers_PassesPageNumberAndPageSize_ToQuery()
+    {
+        var users = new List<User> { new User { Id = 1, Username = "jdoe", Email = "jdoe@test.com", FirstName = "John", LastName = "Doe" } };
+        var pagedResult = new PagedResult<User>(users, 1, 5, 2);
+
+        GetUsersQuery? dispatchedQuery = null;
+        _queryDispatcher
+            .Dispatch<GetUsersQuery, Result<PagedResult<User>>>(Arg.Do<GetUsersQuery>(q => dispatchedQuery = q), Arg.Any<CancellationToken>())
+            .Returns(Result<PagedResult<User>>.Success(pagedResult));
+
+        await _sut.GetUsers(CreateRequestWithQueryParams(new Dictionary<string, string?> { { "pageNumber", "2" }, { "pageSize", "5" } }), CancellationToken.None);
+
+        Assert.NotNull(dispatchedQuery);
+        Assert.Equal(2, dispatchedQuery!.PageNumber);
+        Assert.Equal(5, dispatchedQuery!.PageSize);
+    }
+
+    [Fact]
+    public async Task GetUsers_ClampsNegativePageValues_ToOne()
+    {
+        var users = new List<User> { new User { Id = 1, Username = "jdoe", Email = "jdoe@test.com", FirstName = "John", LastName = "Doe" } };
+        var pagedResult = new PagedResult<User>(users, 1, 1, 1);
+
+        GetUsersQuery? dispatchedQuery = null;
+        _queryDispatcher
+            .Dispatch<GetUsersQuery, Result<PagedResult<User>>>(Arg.Do<GetUsersQuery>(q => dispatchedQuery = q), Arg.Any<CancellationToken>())
+            .Returns(Result<PagedResult<User>>.Success(pagedResult));
+
+        await _sut.GetUsers(CreateRequestWithQueryParams(new Dictionary<string, string?> { { "pageNumber", "-1" }, { "pageSize", "0" } }), CancellationToken.None);
+
+        Assert.NotNull(dispatchedQuery);
+        Assert.Equal(1, dispatchedQuery!.PageNumber);
+        Assert.Equal(1, dispatchedQuery!.PageSize);
     }
 
     // ── CreateUser ──────────────────────────────────────────────────────────
