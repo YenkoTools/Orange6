@@ -4,6 +4,10 @@
 GET {{baseUrl}}/version
 Accept: application/json
 
+### Get Paged Users
+GET {{baseUrl}}/users?pageNumber=1&pageSize=10
+Accept: application/json
+
 ### Create User
 POST {{baseUrl}}/users
 Content-Type: application/json
