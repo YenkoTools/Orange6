@@ -34,6 +34,8 @@ public class UserRepositoryTests : IDisposable
             File.Delete(dbFile);
     }
 
+    private const int SeedCount = 25;
+
     private static User CreateUser(string username = "testuser", string email = "test@example.com") =>
         new() { Username = username, Email = email, FirstName = "Test", LastName = "User" };
 
@@ -116,15 +118,15 @@ public class UserRepositoryTests : IDisposable
 
         var result = await _repository.GetAllAsync();
 
-        Assert.Equal(2, result.Count());
+        Assert.Equal(SeedCount + 2, result.Count());
     }
 
     [Fact]
-    public async Task GetAllAsync_ShouldReturnEmpty_WhenNoUsers()
+    public async Task GetAllAsync_ShouldReturnSeedUsers_WhenNoUsersAdded()
     {
         var result = await _repository.GetAllAsync();
 
-        Assert.Empty(result);
+        Assert.Equal(SeedCount, result.Count());
     }
 
     // FindAsync
@@ -172,7 +174,7 @@ public class UserRepositoryTests : IDisposable
 
         var result = await _repository.GetPagedAsync(page: 1, pageSize: 3);
 
-        Assert.Equal(5, result.TotalCount);
+        Assert.Equal(SeedCount + 5, result.TotalCount);
     }
 
     [Fact]
@@ -183,7 +185,7 @@ public class UserRepositoryTests : IDisposable
 
         var result = await _repository.GetPagedAsync(page: 2, pageSize: 3);
 
-        Assert.Equal(2, result.Items.Count());
+        Assert.Equal(3, result.Items.Count());
         Assert.Equal(2, result.PageNumber);
     }
 
@@ -263,11 +265,11 @@ public class UserRepositoryTests : IDisposable
     // CountAsync
 
     [Fact]
-    public async Task CountAsync_ShouldReturnZero_WhenEmpty()
+    public async Task CountAsync_ShouldReturnSeedCount_WhenNoUsersAdded()
     {
         var count = await _repository.CountAsync();
 
-        Assert.Equal(0, count);
+        Assert.Equal(SeedCount, count);
     }
 
     [Fact]
@@ -278,7 +280,7 @@ public class UserRepositoryTests : IDisposable
 
         var count = await _repository.CountAsync();
 
-        Assert.Equal(2, count);
+        Assert.Equal(SeedCount + 2, count);
     }
 
     // AnyAsync
