@@ -144,6 +144,29 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatche
             : result.ToProblemDetails();
     }
 
+    [Function("GetUserById")]
+    [OpenApiOperation(operationId: "GetUserById", tags: ["Users"], Summary = "Get user by id", Description = "Retrieves a single user by their unique identifier.", Visibility = OpenApiVisibilityType.Important)]
+    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(int), Description = "The unique identifier of the user.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(User), Summary = "OK", Description = "The requested user.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.NotFound, contentType: "application/json", bodyType: typeof(ProblemDetails), Summary = "Not found", Description = "The user was not found.")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.InternalServerError, contentType: "application/json", bodyType: typeof(ProblemDetails), Summary = "Error", Description = "An unexpected error occurred.")]
+    public async Task<IResult> GetUserById(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "users/{id:int}")] HttpRequest req,
+        int id,
+        CancellationToken cancellationToken)
+    {
+        logger.LogInformation("GetUserById function processed a request.");
+
+        var query = new GetUserByIdQuery(id);
+
+        var result = await queryDispatcher.Dispatch<GetUserByIdQuery, Result<User>>(query, cancellationToken);
+
+        logger.LogInformation("GetUserById result: {IsSuccess}", result.IsSuccess);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : result.ToProblemDetails();
+    }
+
     [Function("GetUsers")]
     [OpenApiOperation(operationId: "GetUsers", tags: ["Users"], Summary = "Get users", Description = "Retrieves a paginated list of users.", Visibility = OpenApiVisibilityType.Important)]
     [OpenApiParameter(name: "pageNumber", In = ParameterLocation.Query, Required = false, Type = typeof(int), Description = "The page number (1-based). Defaults to 1.")]

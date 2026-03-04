@@ -62,6 +62,67 @@ public class UserFunctionsTests
         return context.Request;
     }
 
+    // ── GetUserById ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task GetUserById_ReturnsOk_WhenQuerySucceeds()
+    {
+        var user = new User { Id = 1, Username = "jdoe", Email = "jdoe@test.com", FirstName = "John", LastName = "Doe" };
+
+        _queryDispatcher
+            .Dispatch<GetUserByIdQuery, Result<User>>(Arg.Any<GetUserByIdQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result<User>.Success(user));
+
+        var result = await _sut.GetUserById(CreateEmptyRequest(), 1, CancellationToken.None);
+
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
+        Assert.Equal(StatusCodes.Status200OK, statusResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUserById_ReturnsNotFound_WhenQueryReturnsNotFound()
+    {
+        _queryDispatcher
+            .Dispatch<GetUserByIdQuery, Result<User>>(Arg.Any<GetUserByIdQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result<User>.NotFound("User"));
+
+        var result = await _sut.GetUserById(CreateEmptyRequest(), 99, CancellationToken.None);
+
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
+        Assert.Equal(StatusCodes.Status404NotFound, statusResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUserById_ReturnsProblem_WhenQueryFails()
+    {
+        var error = new Error("Error.InternalServerError", "Something went wrong");
+
+        _queryDispatcher
+            .Dispatch<GetUserByIdQuery, Result<User>>(Arg.Any<GetUserByIdQuery>(), Arg.Any<CancellationToken>())
+            .Returns(Result<User>.Failure(error));
+
+        var result = await _sut.GetUserById(CreateEmptyRequest(), 1, CancellationToken.None);
+
+        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
+        Assert.Equal(StatusCodes.Status500InternalServerError, statusResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUserById_PassesIdToQuery()
+    {
+        var user = new User { Id = 5, Username = "jdoe", Email = "jdoe@test.com", FirstName = "John", LastName = "Doe" };
+
+        GetUserByIdQuery? dispatchedQuery = null;
+        _queryDispatcher
+            .Dispatch<GetUserByIdQuery, Result<User>>(Arg.Do<GetUserByIdQuery>(q => dispatchedQuery = q), Arg.Any<CancellationToken>())
+            .Returns(Result<User>.Success(user));
+
+        await _sut.GetUserById(CreateEmptyRequest(), 5, CancellationToken.None);
+
+        Assert.NotNull(dispatchedQuery);
+        Assert.Equal(5, dispatchedQuery!.UserId);
+    }
+
     // ── GetUsers ─────────────────────────────────────────────────────────────
 
     [Fact]
