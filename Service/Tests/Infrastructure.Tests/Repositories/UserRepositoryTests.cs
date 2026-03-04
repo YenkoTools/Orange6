@@ -34,7 +34,7 @@ public class UserRepositoryTests : IDisposable
             File.Delete(dbFile);
     }
 
-    private const int SeedCount = 25;
+    private const int SeedCount = 35;
 
     private static User CreateUser(string username = "testuser", string email = "test@example.com") =>
         new() { Username = username, Email = email, FirstName = "Test", LastName = "User" };
