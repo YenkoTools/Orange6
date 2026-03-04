@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
 
         // Command handlers
         services.AddScoped<ICommandHandler<CreateUserCommand, Result<User>>, CreateUserCommandHandler>();
+        services.AddScoped<ICommandHandler<DeleteUserCommand, Result>, DeleteUserCommandHandler>();
 
         // Query handlers
         services.AddScoped<IQueryHandler<GetUserByIdQuery, Result<User>>, GetUserByIdQueryHandler>();

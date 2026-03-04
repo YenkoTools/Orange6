@@ -13,26 +13,62 @@ Orange6 is a full-stack web application consisting of an Azure Functions API bac
 
 ```
 Orange6/
-├── Api/        # Azure Functions v4 (.NET 8) backend
-└── Client/     # Astro + React + Tailwind CSS frontend
+├── Service/                  # .NET 8 backend (Clean Architecture)
+│   ├── Api/                  # Azure Functions v4 entry point
+│   ├── Application/          # Use cases, commands, queries, and behaviors
+│   ├── Domain/               # Entities, value objects, and domain errors
+│   ├── Infrastructure/       # Repositories and external services
+│   └── Service.sln           # Solution file
+└── Client/                   # Astro + React + Tailwind CSS frontend
 ```
 
 ---
 
-## Api
+## Service
 
-The `Api` project is an [Azure Functions v4](https://learn.microsoft.com/azure/azure-functions/functions-versions) application running on the **.NET 8 isolated worker model**. It exposes HTTP-triggered functions that serve as the backend for the client application.
+The `Service` directory contains the .NET 8 backend, organized following **Clean Architecture** principles. Each layer has a well-defined responsibility and depends only on layers closer to the domain.
+
+### Api
+
+The `Service/Api` project is an [Azure Functions v4](https://learn.microsoft.com/azure/azure-functions/functions-versions) application running on the **.NET 8 isolated worker model**. It is the entry point for all HTTP requests and delegates work to the `Application` layer.
 
 **Key technologies:**
 - .NET 8
 - Azure Functions v4 (isolated worker)
 - ASP.NET Core integration (`Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore`)
+- OpenAPI support (`Microsoft.Azure.Functions.Worker.Extensions.OpenApi`)
 - Application Insights telemetry
 
-**Functions:**
-| Function | Trigger | Method(s) | Description |
-|---|---|---|---|
-| `HelloFunction` | HTTP | GET, POST | Returns a welcome message. |
+**Endpoints:**
+| Function | Trigger | Method(s) | Route | Description |
+|---|---|---|---|---|
+| `CreateUser` | HTTP | POST | `/api/users` | Creates a new user in the system. |
+| `Version` | HTTP | GET | `/api/version` | Returns the current API version information. |
+
+### Application
+
+The `Service/Application` project contains the application use cases implemented as commands and queries (CQRS pattern). It defines abstractions for dispatching, pipeline behaviors (e.g., logging, validation), and repository interfaces.
+
+**Key technologies:**
+- CQRS with `ICommandDispatcher` / `IQueryDispatcher`
+- FluentValidation pipeline behavior
+- No dependency on infrastructure or framework concerns
+
+### Domain
+
+The `Service/Domain` project contains the core business entities and domain primitives. It has no dependencies on any other project.
+
+**Key contents:**
+- `Entities/` — `User`, base `Entity`
+- `Common/` — `Result<T>`, `Error`, `PagedResult<T>`
+
+### Infrastructure
+
+The `Service/Infrastructure` project implements the interfaces defined in `Application`. It contains repository implementations and external service integrations.
+
+**Key contents:**
+- `Repositories/` — `InMemoryUserRepository`
+- `Services/` — `MetricsService`
 
 ---
 
@@ -99,23 +135,23 @@ swa --version
 
 ## Build, Test & Package
 
-### Api
+### Service
 
 ```bash
 # Restore dependencies
-dotnet restore Api/Api.csproj
+dotnet restore Service/Service.sln
 
 # Build (Debug)
-dotnet build Api/Api.csproj
+dotnet build Service/Service.sln
 
 # Build (Release)
-dotnet build Api/Api.csproj --configuration Release
+dotnet build Service/Service.sln --configuration Release
 
 # Run tests
-dotnet test --configuration Release --verbosity normal
+dotnet test Service/Service.sln --configuration Release --verbosity normal
 
-# Publish (Release) — outputs to publish/api
-dotnet publish Api/Api.csproj --configuration Release --output publish/api
+# Publish Api (Release) — outputs to publish/api
+dotnet publish Service/Api/Api.csproj --configuration Release --output publish/api
 ```
 
 ### Client
@@ -138,10 +174,10 @@ npm run preview
 
 The API dev server runs on `http://localhost:7071` and the client dev server runs on `http://localhost:4321`. Both can be started independently or together via the SWA CLI.
 
-### Run the Api
+### Run the Service Api
 
 ```bash
-cd Api
+cd Service/Api
 func host start --port 7071
 ```
 
@@ -173,7 +209,7 @@ The workflow is defined in [.github/workflows/azure-static-web-apps.yml](.github
 
 | Job | Description |
 |---|---|
-| **Build & Test Api** | Sets up .NET 8, restores dependencies, builds in Release mode, runs any test projects found, and publishes the Functions app to a staging artifact. |
+| **Build & Test Service** | Sets up .NET 8, restores dependencies from `Service/Service.sln`, builds in Release mode, runs any test projects found, and publishes the Functions app (`Service/Api`) to a staging artifact. |
 | **Build Client** | Sets up Node.js 20, installs dependencies via `npm ci`, runs `astro check` for type checking, and builds the Astro site to a staging artifact. |
 | **Deploy to Azure SWA** | Runs only after both build jobs succeed. Downloads the pre-built client and API artifacts and deploys them to Azure Static Web Apps using the `azure/static-web-apps-deploy` action. Both the Oryx client and API build steps are skipped since the artifacts are already built. |
 
