@@ -89,5 +89,15 @@ public class DatabaseInitializer
         ("chochang",          "cho.chang@hogwarts.edu",            "Cho",        "Chang"),
         ("lavenderbrown",     "lavender.brown@hogwarts.edu",       "Lavender",   "Brown"),
         ("dobby",             "dobby@hogwarts.edu",                "Dobby",      "HouseElf"),
+        ("lukeskywalker",     "luke.skywalker@rebellion.org",      "Luke",       "Skywalker"),
+        ("leiaorgana",        "leia.organa@rebellion.org",         "Leia",       "Organa"),
+        ("hansolo",           "han.solo@millennium-falcon.com",    "Han",        "Solo"),
+        ("darthvader",        "darth.vader@empire.gov",            "Darth",      "Vader"),
+        ("obiwankenobi",      "obi-wan.kenobi@jediorder.org",      "Obi-Wan",    "Kenobi"),
+        ("yoda",              "yoda@jediorder.org",                "Yoda",       ""),
+        ("chewbacca",         "chewbacca@millennium-falcon.com",   "Chewbacca",  ""),
+        ("r2d2",              "r2d2@rebellion.org",                "R2",         "D2"),
+        ("c3po",              "c3po@rebellion.org",                "C",          "3PO"),
+        ("palpatine",         "palpatine@empire.gov",              "Sheev",      "Palpatine"),
     ];
 }
