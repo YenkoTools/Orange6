@@ -19,6 +19,8 @@ namespace Api.Endpoints;
 
 public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher, ILogger<UserFunctions> logger)
 {
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
     [Function("CreateUser")]
     [OpenApiOperation(operationId: "CreateUser", tags: ["Users"], Summary = "Create a user", Description = "Creates a new user in the system.", Visibility = OpenApiVisibilityType.Important)]
     [OpenApiRequestBody(contentType: "application/json", bodyType: typeof(CreateUserCommand), Required = true, Description = "The user to create.")]
@@ -36,7 +38,7 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatche
         {
             command = await JsonSerializer.DeserializeAsync<CreateUserCommand>(
                 req.Body,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
+                JsonOptions,
                 cancellationToken);
         }
         catch (JsonException ex)
@@ -99,7 +101,7 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatche
         {
             command = await JsonSerializer.DeserializeAsync<UpdateUserCommand>(
                 req.Body,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true },
+                JsonOptions,
                 cancellationToken);
         }
         catch (JsonException ex)

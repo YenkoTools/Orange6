@@ -18,3 +18,34 @@ Content-Type: application/json
     "firstName": "John",
     "lastName": "Doe"
 }
+
+### Get User By Id
+GET {{baseUrl}}/users/1
+Accept: application/json
+
+### Update User By Id
+PUT {{baseUrl}}/users/8
+Content-Type: application/json
+
+{
+    "username": "ginnypotter",
+    "email": "ginny.potter@hogwarts.edu",
+    "firstName": "Ginny",
+    "lastName": "Potter",
+    "updatedAt": "2026-03-05T00:00:00Z"
+}
+
+### Delete User By Id
+DELETE {{baseUrl}}/users/7
+
+
+### Create Draco User
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "username": "dracomalfoy",
+    "email": "draco.malfoy@hogwarts.edu",
+    "firstName": "Draco",
+    "lastName": "Malfoy"
+}

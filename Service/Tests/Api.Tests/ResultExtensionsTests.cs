@@ -84,4 +84,87 @@ public class ResultExtensionsTests
         Assert.NotNull(httpResult.ProblemDetails.Extensions);
         Assert.True(httpResult.ProblemDetails.Extensions.ContainsKey("errors"));
     }
+
+    [Fact]
+    public void ToProblemDetails_HasBadRequestTitle_WhenResultHasNullValueError()
+    {
+        var result = Result.Failure(Error.NullValue);
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal("Bad Request", httpResult.ProblemDetails.Title);
+    }
+
+    [Fact]
+    public void ToProblemDetails_HasNotFoundTitle_WhenResultIsNotFound()
+    {
+        var result = Result.NotFound("User");
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal("Resource Not Found", httpResult.ProblemDetails.Title);
+    }
+
+    [Fact]
+    public void ToProblemDetails_HasInternalServerErrorTitle_WhenResultIsGenericFailure()
+    {
+        var error = new Error("Error.SomethingWentWrong", "Something went wrong");
+        var result = Result.Failure(error);
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal("An unexpected error occurred", httpResult.ProblemDetails.Title);
+    }
+
+    [Fact]
+    public void ToProblemDetails_HasBadRequestRfcType_WhenResultHasNullValueError()
+    {
+        var result = Result.Failure(Error.NullValue);
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.1", httpResult.ProblemDetails.Type);
+    }
+
+    [Fact]
+    public void ToProblemDetails_HasNotFoundRfcType_WhenResultIsNotFound()
+    {
+        var result = Result.NotFound("User");
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.5.4", httpResult.ProblemDetails.Type);
+    }
+
+    [Fact]
+    public void ToProblemDetails_HasInternalServerErrorRfcType_WhenResultIsGenericFailure()
+    {
+        var error = new Error("Error.SomethingWentWrong", "Something went wrong");
+        var result = Result.Failure(error);
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal("https://tools.ietf.org/html/rfc7231#section-6.6.1", httpResult.ProblemDetails.Type);
+    }
+
+    [Fact]
+    public void ToProblemDetails_WorksWithGenericResult_WhenResultIsFailure()
+    {
+        var error = new Error("Error.SomethingWentWrong", "Something went wrong");
+        var result = Result<string>.Failure(error);
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal(StatusCodes.Status500InternalServerError, httpResult.StatusCode);
+    }
+
+    [Fact]
+    public void ToProblemDetails_WorksWithGenericResult_WhenResultIsNotFound()
+    {
+        var result = Result<string>.NotFound("Item");
+
+        var httpResult = Assert.IsType<ProblemHttpResult>(result.ToProblemDetails());
+
+        Assert.Equal(StatusCodes.Status404NotFound, httpResult.StatusCode);
+    }
 }
