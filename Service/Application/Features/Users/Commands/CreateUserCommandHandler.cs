@@ -2,6 +2,7 @@ using Application.Abstractions;
 using Application.Interfaces;
 using Domain.Common;
 using Domain.Entities;
+using Domain.Errors;
 
 namespace Application.Features.Users.Commands;
 
@@ -19,6 +20,10 @@ public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, Resul
 
     public async Task<Result<User>> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
+        var existing = await _userRepository.GetByUsernameAsync(command.Username, cancellationToken);
+        if (existing is not null)
+            return Result<User>.Failure(UserErrors.UserWithUsernameExists(command.Username));
+
         var user = new User
         {
             Username = command.Username,

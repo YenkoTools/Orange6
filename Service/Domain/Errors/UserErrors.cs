@@ -12,4 +12,7 @@ public static class UserErrors
 
     public static Error UserByUserIdNotFound(string userId) => new(
         "User.UserByUserIdNotFound", $"User with UserId = '{userId}' was not found");
+
+    public static Error UserWithUsernameExists(string username) => new(
+        "User.UserWithUsernameExists", $"A user with Username = '{username}' already exists");
 }

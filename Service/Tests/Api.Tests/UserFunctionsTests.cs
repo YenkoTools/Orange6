@@ -472,4 +472,18 @@ public class UserFunctionsTests
         var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, statusResult.StatusCode);
     }
+
+    [Fact]
+    public async Task DeleteUser_PassesCorrectId_ToCommand()
+    {
+        DeleteUserCommand? dispatchedCommand = null;
+        _commandDispatcher
+            .Dispatch<DeleteUserCommand, Result>(Arg.Do<DeleteUserCommand>(c => dispatchedCommand = c), Arg.Any<CancellationToken>())
+            .Returns(Result.Success());
+
+        await _sut.DeleteUser(CreateEmptyRequest(), 42, CancellationToken.None);
+
+        Assert.NotNull(dispatchedCommand);
+        Assert.Equal(42, dispatchedCommand!.Id);
+    }
 }

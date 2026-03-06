@@ -1,11 +1,65 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const apiBaseUrl =
+  import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:5000";
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Home">
+  <div>
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-3">
+        Welcome to Orange 🍊
+      </h1>
+      <p class="text-xl text-gray-600">
+        A .NET 10 Clean Architecture service template with a modern front-end
+        client.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+      >
+        <div class="text-3xl mb-3">🏗️</div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">
+          Clean Architecture
+        </h2>
+        <p class="text-sm text-gray-600">
+          Organized into Domain, Application, Infrastructure, and API layers for
+          clear separation of concerns.
+        </p>
+      </div>
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+      >
+        <div class="text-3xl mb-3">⚡</div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Minimal API</h2>
+        <p class="text-sm text-gray-600">
+          Built on .NET 10 Minimal API for high performance and low overhead
+          HTTP endpoints.
+        </p>
+      </div>
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+      >
+        <div class="text-3xl mb-3">🔄</div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">CQRS Pattern</h2>
+        <p class="text-sm text-gray-600">
+          Commands and queries separated for scalable business logic with a
+          custom mediator pattern.
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-orange-50 border border-orange-200 rounded-xl p-6">
+      <h2 class="text-lg font-semibold text-orange-800 mb-2">API Connection</h2>
+      <p class="text-sm text-orange-700">
+        Connected to: <code
+          class="bg-orange-100 text-orange-900 px-2 py-0.5 rounded font-mono text-xs"
+          >{apiBaseUrl}</code
+        >
+      </p>
+    </div>
+  </div>
 </Layout>

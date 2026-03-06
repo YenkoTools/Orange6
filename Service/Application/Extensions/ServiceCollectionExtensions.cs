@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
         // Command handlers
         services.AddScoped<ICommandHandler<CreateUserCommand, Result<User>>, CreateUserCommandHandler>();
         services.AddScoped<ICommandHandler<DeleteUserCommand, Result>, DeleteUserCommandHandler>();
+        services.AddScoped<ICommandHandler<UpdateUserCommand, Result<User>>, UpdateUserCommandHandler>();
 
         // Query handlers
         services.AddScoped<IQueryHandler<GetUserByIdQuery, Result<User>>, GetUserByIdQueryHandler>();

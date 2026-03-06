@@ -172,13 +172,13 @@ npm run preview
 
 ## Development Mode
 
-The API dev server runs on `http://localhost:7071` and the client dev server runs on `http://localhost:4321`. Both can be started independently or together via the SWA CLI.
+The API dev server runs on `http://localhost:7001` and the client dev server runs on `http://localhost:5001`. Both can be started independently or together via the SWA CLI.
 
 ### Run the Service Api
 
 ```bash
 cd Service/Api
-func host start --port 7071
+func host start --port 7001
 ```
 
 ### Run the Client
