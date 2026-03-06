@@ -1,8 +1,5 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
-const apiBaseUrl =
-  import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:5000";
 ---
 
 <Layout title="Home">
@@ -52,14 +49,5 @@ const apiBaseUrl =
       </div>
     </div>
 
-    <div class="bg-orange-50 border border-orange-200 rounded-xl p-6">
-      <h2 class="text-lg font-semibold text-orange-800 mb-2">API Connection</h2>
-      <p class="text-sm text-orange-700">
-        Connected to: <code
-          class="bg-orange-100 text-orange-900 px-2 py-0.5 rounded font-mono text-xs"
-          >{apiBaseUrl}</code
-        >
-      </p>
-    </div>
   </div>
 </Layout>
