@@ -27,7 +27,7 @@
     {
       "label": "api: func host start",
       "type": "shell",
-      "command": "func host start --port 7071",
+      "command": "func host start --port 7001",
       "options": {
         "cwd": "${workspaceFolder}/Service/Api"
       },
@@ -93,7 +93,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": ".*astro.*",
-          "endsPattern": ".*Local.*http://localhost:4321.*"
+          "endsPattern": ".*Local.*http://localhost:5001.*"
         }
       },
       "presentation": {

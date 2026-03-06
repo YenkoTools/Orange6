@@ -19,8 +19,8 @@ dotnet test Service/Service.sln --configuration Release --verbosity normal
 # Run a single test project
 dotnet test Service/Tests/Api.Tests/Api.Tests.csproj
 
-# Run the API locally (port 7071)
-cd Service/Api && func host start --port 7071
+# Run the API locally (port 7001)
+cd Service/Api && func host start --port 7001
 
 # Publish for deployment
 dotnet publish Service/Api/Api.csproj --configuration Release --output publish/api
@@ -30,7 +30,7 @@ dotnet publish Service/Api/Api.csproj --configuration Release --output publish/a
 
 ```bash
 npm install
-npm run dev        # dev server at localhost:4321
+npm run dev        # dev server at localhost:5001
 npm run build      # production build to Client/dist
 npm run preview
 npx astro check    # type checking
@@ -64,7 +64,7 @@ The dependency flow is strictly: `Api` → `Application` → `Domain`. `Infrastr
 
 ### Client
 
-Astro 5 with React 19 islands and Tailwind CSS v4. Pages in `Client/src/pages/`, layouts in `Client/src/layouts/`, components in `Client/src/components/`. The SWA CLI config (`swa-cli.config.json`) points the API proxy to `http://localhost:7071`.
+Astro 5 with React 19 islands and Tailwind CSS v4. Pages in `Client/src/pages/`, layouts in `Client/src/layouts/`, components in `Client/src/components/`. The SWA CLI config (`swa-cli.config.json`) points the API proxy to `http://localhost:7001`.
 
 ## Key Conventions
 
