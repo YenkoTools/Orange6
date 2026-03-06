@@ -1,3 +1,9 @@
+#!/usr/bin/pwsh
+
+# ------------------------
+# git-tag.ps1
+# ------------------------
+
 # Helper script to tag a git repository using the annotated tag format.
 
 param (

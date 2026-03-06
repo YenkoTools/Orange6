@@ -1,10 +1,14 @@
 ---
+import AppVersion from './AppVersion';
 const year = new Date().getFullYear();
 ---
 
 <footer class="bg-gray-100 border-t border-gray-200">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-    <p class="text-sm text-gray-500">&copy; {year} Orange6. All rights reserved.</p>
+    <p class="text-sm text-gray-500">
+      &copy; {year} Orange6. All rights reserved.
+      <AppVersion client:load />
+    </p>
     <nav class="flex items-center gap-4">
       <a href="/" class="text-sm text-gray-500 hover:text-orange-500 transition-colors">Home</a>
       <a href="/users" class="text-sm text-gray-500 hover:text-orange-500 transition-colors">Users</a>
