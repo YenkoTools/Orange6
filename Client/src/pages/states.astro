@@ -1,0 +1,108 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="US States">
+  <div class="max-w-4xl">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-3">US States 🗺️</h1>
+      <p class="text-xl text-gray-600">
+        All 50 US States displayed in alphabetical order.
+      </p>
+    </div>
+
+    <div
+      id="states-grid"
+      class="ag-theme-alpine"
+      style="height: 600px; width: 100%;"
+    >
+    </div>
+  </div>
+</Layout>
+
+<style>
+  @import "ag-grid-community/styles/ag-grid.css";
+  @import "ag-grid-community/styles/ag-theme-alpine.css";
+</style>
+
+<script>
+  import {
+    AllCommunityModule,
+    ModuleRegistry,
+    createGrid,
+  } from "ag-grid-community";
+
+  ModuleRegistry.registerModules([AllCommunityModule]);
+
+  const states = [
+    { name: "Alabama", abbreviation: "AL" },
+    { name: "Alaska", abbreviation: "AK" },
+    { name: "Arizona", abbreviation: "AZ" },
+    { name: "Arkansas", abbreviation: "AR" },
+    { name: "California", abbreviation: "CA" },
+    { name: "Colorado", abbreviation: "CO" },
+    { name: "Connecticut", abbreviation: "CT" },
+    { name: "Delaware", abbreviation: "DE" },
+    { name: "Florida", abbreviation: "FL" },
+    { name: "Georgia", abbreviation: "GA" },
+    { name: "Hawaii", abbreviation: "HI" },
+    { name: "Idaho", abbreviation: "ID" },
+    { name: "Illinois", abbreviation: "IL" },
+    { name: "Indiana", abbreviation: "IN" },
+    { name: "Iowa", abbreviation: "IA" },
+    { name: "Kansas", abbreviation: "KS" },
+    { name: "Kentucky", abbreviation: "KY" },
+    { name: "Louisiana", abbreviation: "LA" },
+    { name: "Maine", abbreviation: "ME" },
+    { name: "Maryland", abbreviation: "MD" },
+    { name: "Massachusetts", abbreviation: "MA" },
+    { name: "Michigan", abbreviation: "MI" },
+    { name: "Minnesota", abbreviation: "MN" },
+    { name: "Mississippi", abbreviation: "MS" },
+    { name: "Missouri", abbreviation: "MO" },
+    { name: "Montana", abbreviation: "MT" },
+    { name: "Nebraska", abbreviation: "NE" },
+    { name: "Nevada", abbreviation: "NV" },
+    { name: "New Hampshire", abbreviation: "NH" },
+    { name: "New Jersey", abbreviation: "NJ" },
+    { name: "New Mexico", abbreviation: "NM" },
+    { name: "New York", abbreviation: "NY" },
+    { name: "North Carolina", abbreviation: "NC" },
+    { name: "North Dakota", abbreviation: "ND" },
+    { name: "Ohio", abbreviation: "OH" },
+    { name: "Oklahoma", abbreviation: "OK" },
+    { name: "Oregon", abbreviation: "OR" },
+    { name: "Pennsylvania", abbreviation: "PA" },
+    { name: "Rhode Island", abbreviation: "RI" },
+    { name: "South Carolina", abbreviation: "SC" },
+    { name: "South Dakota", abbreviation: "SD" },
+    { name: "Tennessee", abbreviation: "TN" },
+    { name: "Texas", abbreviation: "TX" },
+    { name: "Utah", abbreviation: "UT" },
+    { name: "Vermont", abbreviation: "VT" },
+    { name: "Virginia", abbreviation: "VA" },
+    { name: "Washington", abbreviation: "WA" },
+    { name: "West Virginia", abbreviation: "WV" },
+    { name: "Wisconsin", abbreviation: "WI" },
+    { name: "Wyoming", abbreviation: "WY" },
+  ];
+
+  const gridElement = document.getElementById("states-grid");
+  if (gridElement) {
+    createGrid(gridElement, {
+      columnDefs: [
+        { field: "name", headerName: "State", sort: "asc", flex: 2 },
+        { field: "abbreviation", headerName: "Abbreviation", flex: 1 },
+      ],
+      rowData: states,
+      defaultColDef: {
+        sortable: true,
+        filter: true,
+        resizable: true,
+      },
+      pagination: true,
+      paginationPageSize: 10,
+      paginationPageSizeSelector: [10, 25, 50],
+    });
+  }
+</script>

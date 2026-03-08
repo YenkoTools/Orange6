@@ -1,0 +1,82 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Users">
+  <div class="max-w-6xl w-full">
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-3">Users</h1>
+      <p class="text-xl text-gray-600">Manage and browse all users in the system.</p>
+    </div>
+
+    <div
+      id="users-grid"
+      class="ag-theme-alpine"
+      style="height: 600px; width: 100%;"
+    >
+    </div>
+  </div>
+</Layout>
+
+<style>
+  @import "ag-grid-community/styles/ag-grid.css";
+  @import "ag-grid-community/styles/ag-theme-alpine.css";
+</style>
+
+<script>
+  import {
+    AllCommunityModule,
+    ModuleRegistry,
+    createGrid,
+  } from "ag-grid-community";
+  import type { GridOptions, IDatasource, IGetRowsParams } from "ag-grid-community";
+
+  ModuleRegistry.registerModules([AllCommunityModule]);
+
+  const PAGE_SIZE = 20;
+
+  const datasource: IDatasource = {
+    getRows(params: IGetRowsParams) {
+      const pageNumber = Math.floor(params.startRow / PAGE_SIZE) + 1;
+
+      fetch(`/api/users?pageNumber=${pageNumber}&pageSize=${PAGE_SIZE}`)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((data) => {
+          params.successCallback(data.items, data.totalCount);
+        })
+        .catch((err) => {
+          console.error("Failed to load users:", err);
+          params.failCallback();
+        });
+    },
+  };
+
+  const gridOptions: GridOptions = {
+    columnDefs: [
+      { field: "id", headerName: "ID", width: 80, sortable: false },
+      { field: "username", headerName: "Username", flex: 1, sortable: false },
+      { field: "firstName", headerName: "First Name", flex: 1, sortable: false },
+      { field: "lastName", headerName: "Last Name", flex: 1, sortable: false },
+      { field: "email", headerName: "Email", flex: 2, sortable: false },
+    ],
+    defaultColDef: {
+      resizable: true,
+      filter: false,
+    },
+    rowModelType: "infinite",
+    datasource,
+    cacheBlockSize: PAGE_SIZE,
+    maxBlocksInCache: 5,
+    infiniteInitialRowCount: PAGE_SIZE,
+    overlayLoadingTemplate: '<span class="ag-overlay-loading-center">Loading users...</span>',
+    overlayNoRowsTemplate: '<span class="ag-overlay-no-rows-center">No users found.</span>',
+  };
+
+  const gridElement = document.getElementById("users-grid");
+  if (gridElement) {
+    createGrid(gridElement, gridOptions);
+  }
+</script>
