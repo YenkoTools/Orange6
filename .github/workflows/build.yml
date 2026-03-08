@@ -1,4 +1,4 @@
-name: Build, Test & Deploy
+name: Build Orange6
 
 # On-demand only.  Run from the Actions tab → "Run workflow".
 on:
