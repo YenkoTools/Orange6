@@ -12,6 +12,7 @@ on:
         options:
           - production
           - staging
+          - testing
 
 permissions:
   id-token: write   # needed if you switch to OIDC auth later
@@ -33,11 +34,11 @@ jobs:
           dotnet-version: "8.0.x"
 
       - name: Restore dependencies
-        run: dotnet restore Api/Api.csproj
+        run: dotnet restore Service/Service.sln
 
       - name: Build (Release)
         run: |
-          dotnet build Api/Api.csproj \
+          dotnet build Service/Service.sln \
             --no-restore \
             --configuration Release
 
@@ -45,7 +46,7 @@ jobs:
         # If you add an xUnit / NUnit test project later, it will be picked up
         # automatically by the wildcard pattern below.
         run: |
-          dotnet test \
+          dotnet test Service/Service.sln \
             --no-build \
             --configuration Release \
             --verbosity normal \
@@ -54,7 +55,7 @@ jobs:
 
       - name: Publish (self-contained output for SWA)
         run: |
-          dotnet publish Api/Api.csproj \
+          dotnet publish Service/Service.sln \
             --no-build \
             --configuration Release \
             --output "${{ github.workspace }}/publish/api"
@@ -121,6 +122,7 @@ jobs:
         with:
           name: api-publish
           path: deploy/api
+
 
       - name: Deploy to Azure Static Web Apps
         uses: azure/static-web-apps-deploy@v1
