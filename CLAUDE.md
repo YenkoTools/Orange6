@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Orange6 is a full-stack web application with a .NET 8 Azure Functions backend (`Service/`) and an Astro + React frontend (`Client/`), designed to deploy on Azure Static Web Apps.
+Orange6 is a full-stack web application with a .NET 10 Azure Functions backend (`Service/`) and an Astro + React frontend (`Client/`), designed to deploy on Azure Static Web Apps.
 
 ## Commands
 
@@ -72,4 +72,4 @@ Astro 5 with React 19 islands and Tailwind CSS v4. Pages in `Client/src/pages/`,
 - `Result.IsNotFound` is detected by `Error.Code` starting with `"NotFound"` — follow this convention for new not-found errors
 - Pipeline behaviors are order-sensitive; new behaviors are appended after existing ones in `ServiceCollectionExtensions`
 - Tests use xUnit + NSubstitute; test projects mirror the source project they cover under `Service/Tests/`
-- .NET SDK version is pinned to `8.0.x` via `Service/global.json`
+- .NET SDK version is pinned to `10.0.x` via `Service/global.json`
