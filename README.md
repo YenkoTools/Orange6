@@ -13,7 +13,7 @@ Orange6 is a full-stack web application consisting of an Azure Functions API bac
 
 ```
 Orange6/
-├── Service/                  # .NET 8 backend (Clean Architecture)
+├── Service/                  # .NET 10 backend (Clean Architecture)
 │   ├── Api/                  # Azure Functions v4 entry point
 │   ├── Application/          # Use cases, commands, queries, and behaviors
 │   ├── Domain/               # Entities, value objects, and domain errors
@@ -26,14 +26,14 @@ Orange6/
 
 ## Service
 
-The `Service` directory contains the .NET 8 backend, organized following **Clean Architecture** principles. Each layer has a well-defined responsibility and depends only on layers closer to the domain.
+The `Service` directory contains the .NET 10 backend, organized following **Clean Architecture** principles. Each layer has a well-defined responsibility and depends only on layers closer to the domain.
 
 ### Api
 
-The `Service/Api` project is an [Azure Functions v4](https://learn.microsoft.com/azure/azure-functions/functions-versions) application running on the **.NET 8 isolated worker model**. It is the entry point for all HTTP requests and delegates work to the `Application` layer.
+The `Service/Api` project is an [Azure Functions v4](https://learn.microsoft.com/azure/azure-functions/functions-versions) application running on the **.NET 10 isolated worker model**. It is the entry point for all HTTP requests and delegates work to the `Application` layer.
 
 **Key technologies:**
-- .NET 8
+- .NET 10
 - Azure Functions v4 (isolated worker)
 - ASP.NET Core integration (`Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore`)
 - OpenAPI support (`Microsoft.Azure.Functions.Worker.Extensions.OpenApi`)
@@ -86,7 +86,7 @@ The `Client` project is a static frontend built with [Astro 5](https://astro.bui
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10)
 - [Node.js 20+](https://nodejs.org) and npm
 
 ### Install Azure Functions Core Tools
@@ -209,7 +209,7 @@ The workflow is defined in [.github/workflows/azure-static-web-apps.yml](.github
 
 | Job | Description |
 |---|---|
-| **Build & Test Service** | Sets up .NET 8, restores dependencies from `Service/Service.sln`, builds in Release mode, runs any test projects found, and publishes the Functions app (`Service/Api`) to a staging artifact. |
+| **Build & Test Service** | Sets up .NET 10, restores dependencies from `Service/Service.sln`, builds in Release mode, runs any test projects found, and publishes the Functions app (`Service/Api`) to a staging artifact. |
 | **Build Client** | Sets up Node.js 20, installs dependencies via `npm ci`, runs `astro check` for type checking, and builds the Astro site to a staging artifact. |
 | **Deploy to Azure SWA** | Runs only after both build jobs succeed. Downloads the pre-built client and API artifacts and deploys them to Azure Static Web Apps using the `azure/static-web-apps-deploy` action. Both the Oryx client and API build steps are skipped since the artifacts are already built. |
 
