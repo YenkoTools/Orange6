@@ -43,6 +43,10 @@ The `Service/Api` project is an [Azure Functions v4](https://learn.microsoft.com
 | Function | Trigger | Method(s) | Route | Description |
 |---|---|---|---|---|
 | `CreateUser` | HTTP | POST | `/api/users` | Creates a new user in the system. |
+| `UpdateUser` | HTTP | PUT | `/api/users/{id}` | Updates an existing user by their unique identifier. |
+| `GetUserById` | HTTP | GET | `/api/users/{id}` | Retrieves a single user by their unique identifier. |
+| `GetUsers` | HTTP | GET | `/api/users` | Retrieves a paginated list of users (`pageNumber`, `pageSize` query params). |
+| `DeleteUser` | HTTP | DELETE | `/api/users/{id}` | Deletes an existing user by their unique identifier. |
 | `Version` | HTTP | GET | `/api/version` | Returns the current API version information. |
 
 ### Application
@@ -66,9 +70,17 @@ The `Service/Domain` project contains the core business entities and domain prim
 
 The `Service/Infrastructure` project implements the interfaces defined in `Application`. It contains repository implementations and external service integrations.
 
+**Key technologies:**
+- Dapper ORM for data access
+- SQLite (`Microsoft.Data.Sqlite`) as the database engine
+- `DatabaseFactory` / `DatabaseInitializer` for connection management and schema setup
+- Database path is configured via the `Database` section in application settings (`DatabaseOptions`)
+
 **Key contents:**
-- `Repositories/` — `InMemoryUserRepository`
+- `Repositories/` — `UserRepository` (SQLite-backed via Dapper)
 - `Services/` — `MetricsService`
+- `Data/` — `DatabaseFactory`, `DatabaseInitializer`
+- `Configuration/` — `DatabaseOptions`
 
 ---
 
