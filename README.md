@@ -218,3 +218,23 @@ The workflow is defined in [.github/workflows/azure-static-web-apps.yml](.github
 | Secret | Description |
 |---|---|
 | `AZURE_STATIC_WEB_APPS_API_TOKEN` | Deployment token from the Azure Static Web Apps resource. Add it under **Settings → Secrets and variables → Actions**. |
+
+---
+
+## Contributors
+
+<!-- readme: collaborators,contributors -start -->
+<table>
+	<tbody>
+		<tr>
+            <td align="center">
+                <a href="https://github.com/jkulba">
+                    <img src="https://avatars.githubusercontent.com/u/830075?v=4" width="100;" alt="jkulba"/>
+                    <br />
+                    <sub><b>Jim Kulba</b></sub>
+                </a>
+            </td>
+		</tr>
+	<tbody>
+</table>
+<!-- readme: collaborators,contributors -end -->
