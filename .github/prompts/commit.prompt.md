@@ -64,5 +64,8 @@ Separate the header from the body with a blank line. Group bullet points under b
    - If there are **no staged changes**, run `git status --short` to show the user what is unstaged, then ask the user which files to stage (specific paths, or all with `-A`), and run `git add <paths>` accordingly.
 2. Run `git diff --staged` to retrieve the full staged diff.
 3. Analyse the diff and compose the commit message following the rules above.
-4. Present the commit message to the user for confirmation.
-5. Once confirmed, run `git commit -m "<header>" -m "<body>"` to submit the commit.
+4. Present the commit message to the user and ask: **"Do you want to commit with this message? (yes / no / edit)"**
+   - **yes** — proceed to step 5.
+   - **no** — abort; do not run `git commit`.
+   - **edit** — ask the user what to change, revise the message, then repeat step 4.
+5. Once the user confirms with **yes**, run `git commit -m "<header>" -m "<body>"` to submit the commit.
