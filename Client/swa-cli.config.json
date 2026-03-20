@@ -4,10 +4,10 @@
     "app": {
       "appLocation": ".",
       "outputLocation": "dist",
-      "apiLocation": "../Service/Api",
+      "apiLocation": "../Service/src/Api",
       "appDevserverUrl": "http://localhost:5001",
       "apiDevserverUrl": "http://localhost:7001",
-      "run": "npm run dev & (cd ../Service/Api && func host start --port 7001)",
+      "run": "npm run dev & (cd ../Service/src/Api && func host start --port 7001)",
       "timeout": 60000
     }
   }
