@@ -24,11 +24,13 @@ public class CommandPerformanceBehavior<TCommand, TCommandResult> : ICommandPipe
     {
         var commandName = typeof(TCommand).Name;
         var stopwatch = Stopwatch.StartNew();
+        var succeeded = false;
 
         try
         {
             var result = await next();
             stopwatch.Stop();
+            succeeded = true;
 
             _logger.LogDebug("Command performance: {CommandName} executed in {ElapsedMilliseconds}ms. Command: {@Command}",
                 commandName, stopwatch.ElapsedMilliseconds, command);
@@ -41,12 +43,14 @@ public class CommandPerformanceBehavior<TCommand, TCommandResult> : ICommandPipe
 
             return result;
         }
-        catch (Exception)
+        finally
         {
-            stopwatch.Stop();
-            _logger.LogDebug("Command failed: {CommandName} executed in {ElapsedMilliseconds}ms before exception. Command: {@Command}",
-                commandName, stopwatch.ElapsedMilliseconds, command);
-            throw;
+            if (!succeeded)
+            {
+                stopwatch.Stop();
+                _logger.LogDebug("Command failed: {CommandName} executed in {ElapsedMilliseconds}ms before exception. Command: {@Command}",
+                    commandName, stopwatch.ElapsedMilliseconds, command);
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ public class DefaultResultAnalyzer : IResultAnalyzer
     private static bool IsResultType(Type type) =>
         type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Result<>);
 
-    private ResultAnalysis AnalyzeResultPattern(object result, Type resultType)
+    private static ResultAnalysis AnalyzeResultPattern(object result, Type resultType)
     {
         var isSuccess = GetPropertyValue<bool>(result, resultType, "IsSuccess");
 

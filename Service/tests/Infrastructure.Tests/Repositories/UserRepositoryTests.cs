@@ -31,9 +31,18 @@ public class UserRepositoryTests : IDisposable
 
     public void Dispose()
     {
-        var dbFile = $"{_dbPath}.sqlite";
-        if (File.Exists(dbFile))
-            File.Delete(dbFile);
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            var dbFile = $"{_dbPath}.sqlite";
+            if (File.Exists(dbFile))
+                File.Delete(dbFile);
+        }
     }
 
     private const int SeedCount = 35;

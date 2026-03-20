@@ -24,11 +24,13 @@ public class QueryPerformanceBehavior<TQuery, TQueryResult> : IQueryPipelineBeha
     {
         var queryName = typeof(TQuery).Name;
         var stopwatch = Stopwatch.StartNew();
+        var succeeded = false;
 
         try
         {
             var result = await next();
             stopwatch.Stop();
+            succeeded = true;
 
             _logger.LogDebug("Query performance: {QueryName} executed in {ElapsedMilliseconds}ms. Query: {@Query}",
                 queryName, stopwatch.ElapsedMilliseconds, query);
@@ -41,12 +43,14 @@ public class QueryPerformanceBehavior<TQuery, TQueryResult> : IQueryPipelineBeha
 
             return result;
         }
-        catch (Exception)
+        finally
         {
-            stopwatch.Stop();
-            _logger.LogDebug("Query failed: {QueryName} executed in {ElapsedMilliseconds}ms before exception. Query: {@Query}",
-                queryName, stopwatch.ElapsedMilliseconds, query);
-            throw;
+            if (!succeeded)
+            {
+                stopwatch.Stop();
+                _logger.LogDebug("Query failed: {QueryName} executed in {ElapsedMilliseconds}ms before exception. Query: {@Query}",
+                    queryName, stopwatch.ElapsedMilliseconds, query);
+            }
         }
     }
 }

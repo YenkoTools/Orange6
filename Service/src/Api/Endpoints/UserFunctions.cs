@@ -71,7 +71,7 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatche
                     g => g.Key,
                     g => g.Select(f => f.ErrorMessage).ToArray());
 
-            logger.LogWarning("CreateUser validation failed: {Errors}", errors);
+            logger.LogWarning(ex, "CreateUser validation failed: {Errors}", errors);
             return Results.ValidationProblem(errors);
         }
 
@@ -136,7 +136,7 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatche
                     g => g.Key,
                     g => g.Select(f => f.ErrorMessage).ToArray());
 
-            logger.LogWarning("UpdateUser validation failed: {Errors}", errors);
+            logger.LogWarning(ex, "UpdateUser validation failed: {Errors}", errors);
             return Results.ValidationProblem(errors);
         }
 
@@ -225,7 +225,7 @@ public class UserFunctions(ICommandDispatcher commandDispatcher, IQueryDispatche
                     g => g.Key,
                     g => g.Select(f => f.ErrorMessage).ToArray());
 
-            logger.LogWarning("DeleteUser validation failed: {Errors}", errors);
+            logger.LogWarning(ex, "DeleteUser validation failed: {Errors}", errors);
             return Results.ValidationProblem(errors);
         }
 

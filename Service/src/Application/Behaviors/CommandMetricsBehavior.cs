@@ -54,6 +54,8 @@ public class CommandMetricsBehavior<TCommand, TCommandResult> : ICommandPipeline
             { "operation", "command" }
         };
 
+        Exception? thrownException = null;
+
         try
         {
             _metrics.RecordCounter($"{commandName}_attempts", tags);
@@ -91,6 +93,7 @@ public class CommandMetricsBehavior<TCommand, TCommandResult> : ICommandPipeline
         }
         catch (Exception ex)
         {
+            thrownException = ex;
             tags.Add("Outcome", "exception");
             tags.Add("ExceptionType", ex.GetType().Name);
             metricTags.Add("outcome", "exception");
@@ -107,9 +110,14 @@ public class CommandMetricsBehavior<TCommand, TCommandResult> : ICommandPipeline
                 { "exception.message", ex.Message }
             }));
 
-            _logger.LogWarning("BUSINESS_METRIC: Command {CommandName} threw {ExceptionType}", commandName, ex.GetType().Name);
-
             throw;
+        }
+        finally
+        {
+            if (thrownException != null)
+            {
+                _logger.LogWarning(thrownException, "BUSINESS_METRIC: Command {CommandName} threw {ExceptionType}", commandName, thrownException.GetType().Name);
+            }
         }
     }
 

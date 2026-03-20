@@ -28,7 +28,9 @@ builder.Services.AddSingleton<IOpenApiConfigurationOptions>(_ => new OpenApiConf
         License = new OpenApiLicense
         {
             Name = "MIT",
+#pragma warning disable S1075 // MIT license URL is a stable external standard
             Url = new Uri("https://opensource.org/licenses/MIT"),
+#pragma warning restore S1075
         },
     },
     Servers = DefaultOpenApiConfigurationOptions.GetHostNames(),
@@ -44,4 +46,4 @@ builder.Services.AddApplicationServices();
 // Infrastructure services (repositories, metrics)
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Build().Run();
+await builder.Build().RunAsync();
