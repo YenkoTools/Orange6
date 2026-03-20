@@ -5,6 +5,8 @@ namespace Infrastructure.Tests.Repositories;
 
 public class InMemoryUserRepositoryTests
 {
+    private static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
     private static User CreateUser(string username = "testuser", string email = "test@example.com") =>
         new() { Username = username, Email = email, FirstName = "Test", LastName = "User" };
 
@@ -14,8 +16,8 @@ public class InMemoryUserRepositoryTests
     public async Task AddAsync_ShouldAssignIncrementalId()
     {
         var repo = new InMemoryUserRepository();
-        var user1 = await repo.AddAsync(CreateUser("u1", "u1@example.com"));
-        var user2 = await repo.AddAsync(CreateUser("u2", "u2@example.com"));
+        var user1 = await repo.AddAsync(CreateUser("u1", "u1@example.com"), CancellationToken);
+        var user2 = await repo.AddAsync(CreateUser("u2", "u2@example.com"), CancellationToken);
 
         Assert.Equal(1, user1.Id);
         Assert.Equal(2, user2.Id);
@@ -26,7 +28,7 @@ public class InMemoryUserRepositoryTests
     {
         var before = DateTime.UtcNow;
         var repo = new InMemoryUserRepository();
-        var user = await repo.AddAsync(CreateUser());
+        var user = await repo.AddAsync(CreateUser(), CancellationToken);
 
         Assert.True(user.CreatedAt >= before);
     }
@@ -36,7 +38,7 @@ public class InMemoryUserRepositoryTests
     {
         var before = DateTime.UtcNow;
         var repo = new InMemoryUserRepository();
-        var user = await repo.AddAsync(CreateUser());
+        var user = await repo.AddAsync(CreateUser(), CancellationToken);
 
         Assert.True(user.UpdatedAt >= before);
     }
@@ -46,9 +48,9 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
         var user = CreateUser();
-        await repo.AddAsync(user);
+        await repo.AddAsync(user, CancellationToken);
 
-        var result = await repo.GetByIdAsync(user.Id);
+        var result = await repo.GetByIdAsync(user.Id, CancellationToken);
         Assert.NotNull(result);
         Assert.Equal(user.Username, result.Username);
     }
@@ -59,9 +61,9 @@ public class InMemoryUserRepositoryTests
     public async Task GetByIdAsync_ShouldReturnUser_WhenExists()
     {
         var repo = new InMemoryUserRepository();
-        var added = await repo.AddAsync(CreateUser());
+        var added = await repo.AddAsync(CreateUser(), CancellationToken);
 
-        var result = await repo.GetByIdAsync(added.Id);
+        var result = await repo.GetByIdAsync(added.Id, CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(added.Id, result.Id);
@@ -72,7 +74,7 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
 
-        var result = await repo.GetByIdAsync(999);
+        var result = await repo.GetByIdAsync(999, CancellationToken);
 
         Assert.Null(result);
     }
@@ -83,10 +85,10 @@ public class InMemoryUserRepositoryTests
     public async Task GetAllAsync_ShouldReturnAllUsers()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser("u1", "u1@example.com"));
-        await repo.AddAsync(CreateUser("u2", "u2@example.com"));
+        await repo.AddAsync(CreateUser("u1", "u1@example.com"), CancellationToken);
+        await repo.AddAsync(CreateUser("u2", "u2@example.com"), CancellationToken);
 
-        var result = await repo.GetAllAsync();
+        var result = await repo.GetAllAsync(CancellationToken);
 
         Assert.Equal(2, result.Count());
     }
@@ -96,7 +98,7 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
 
-        var result = await repo.GetAllAsync();
+        var result = await repo.GetAllAsync(CancellationToken);
 
         Assert.Empty(result);
     }
@@ -107,10 +109,10 @@ public class InMemoryUserRepositoryTests
     public async Task FindAsync_ShouldReturnMatchingUsers()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser("alice", "alice@example.com"));
-        await repo.AddAsync(CreateUser("bob", "bob@example.com"));
+        await repo.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
+        await repo.AddAsync(CreateUser("bob", "bob@example.com"), CancellationToken);
 
-        var result = await repo.FindAsync(u => u.Username == "alice");
+        var result = await repo.FindAsync(u => u.Username == "alice", CancellationToken);
 
         Assert.Single(result);
         Assert.Equal("alice", result.First().Username);
@@ -120,9 +122,9 @@ public class InMemoryUserRepositoryTests
     public async Task FindAsync_ShouldReturnEmpty_WhenNoMatch()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser());
+        await repo.AddAsync(CreateUser(), CancellationToken);
 
-        var result = await repo.FindAsync(u => u.Username == "nonexistent");
+        var result = await repo.FindAsync(u => u.Username == "nonexistent", CancellationToken);
 
         Assert.Empty(result);
     }
@@ -134,9 +136,9 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
         for (int i = 1; i <= 5; i++)
-            await repo.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"));
+            await repo.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"), CancellationToken);
 
-        var result = await repo.GetPagedAsync(page: 1, pageSize: 3);
+        var result = await repo.GetPagedAsync(page: 1, pageSize: 3, CancellationToken);
 
         Assert.Equal(3, result.Items.Count());
     }
@@ -146,9 +148,9 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
         for (int i = 1; i <= 5; i++)
-            await repo.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"));
+            await repo.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"), CancellationToken);
 
-        var result = await repo.GetPagedAsync(page: 1, pageSize: 3);
+        var result = await repo.GetPagedAsync(page: 1, pageSize: 3, CancellationToken);
 
         Assert.Equal(5, result.TotalCount);
     }
@@ -158,9 +160,9 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
         for (int i = 1; i <= 5; i++)
-            await repo.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"));
+            await repo.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"), CancellationToken);
 
-        var result = await repo.GetPagedAsync(page: 2, pageSize: 3);
+        var result = await repo.GetPagedAsync(page: 2, pageSize: 3, CancellationToken);
 
         Assert.Equal(2, result.Items.Count());
         Assert.Equal(2, result.PageNumber);
@@ -172,12 +174,12 @@ public class InMemoryUserRepositoryTests
     public async Task UpdateAsync_ShouldUpdateUser()
     {
         var repo = new InMemoryUserRepository();
-        var user = await repo.AddAsync(CreateUser());
+        var user = await repo.AddAsync(CreateUser(), CancellationToken);
         user.FirstName = "Updated";
 
-        await repo.UpdateAsync(user);
+        await repo.UpdateAsync(user, CancellationToken);
 
-        var result = await repo.GetByIdAsync(user.Id);
+        var result = await repo.GetByIdAsync(user.Id, CancellationToken);
         Assert.NotNull(result);
         Assert.Equal("Updated", result.FirstName);
     }
@@ -186,13 +188,13 @@ public class InMemoryUserRepositoryTests
     public async Task UpdateAsync_ShouldSetUpdatedAt()
     {
         var repo = new InMemoryUserRepository();
-        var user = await repo.AddAsync(CreateUser());
+        var user = await repo.AddAsync(CreateUser(), CancellationToken);
         var before = DateTime.UtcNow;
         user.FirstName = "Modified";
 
-        await repo.UpdateAsync(user);
+        await repo.UpdateAsync(user, CancellationToken);
 
-        var result = await repo.GetByIdAsync(user.Id);
+        var result = await repo.GetByIdAsync(user.Id, CancellationToken);
         Assert.NotNull(result);
         Assert.True(result.UpdatedAt >= before);
     }
@@ -203,7 +205,7 @@ public class InMemoryUserRepositoryTests
         var repo = new InMemoryUserRepository();
         var nonExistentUser = new User { Id = 999, Username = "ghost", Email = "ghost@example.com" };
 
-        var exception = await Record.ExceptionAsync(() => repo.UpdateAsync(nonExistentUser));
+        var exception = await Record.ExceptionAsync(() => repo.UpdateAsync(nonExistentUser, CancellationToken));
 
         Assert.Null(exception);
     }
@@ -214,11 +216,11 @@ public class InMemoryUserRepositoryTests
     public async Task DeleteAsync_ShouldRemoveUser()
     {
         var repo = new InMemoryUserRepository();
-        var user = await repo.AddAsync(CreateUser());
+        var user = await repo.AddAsync(CreateUser(), CancellationToken);
 
-        await repo.DeleteAsync(user);
+        await repo.DeleteAsync(user, CancellationToken);
 
-        var result = await repo.GetByIdAsync(user.Id);
+        var result = await repo.GetByIdAsync(user.Id, CancellationToken);
         Assert.Null(result);
     }
 
@@ -228,11 +230,11 @@ public class InMemoryUserRepositoryTests
     public async Task DeleteByIdAsync_ShouldRemoveUser_WhenExists()
     {
         var repo = new InMemoryUserRepository();
-        var user = await repo.AddAsync(CreateUser());
+        var user = await repo.AddAsync(CreateUser(), CancellationToken);
 
-        await repo.DeleteByIdAsync(user.Id);
+        await repo.DeleteByIdAsync(user.Id, CancellationToken);
 
-        var result = await repo.GetByIdAsync(user.Id);
+        var result = await repo.GetByIdAsync(user.Id, CancellationToken);
         Assert.Null(result);
     }
 
@@ -241,7 +243,7 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
 
-        var exception = await Record.ExceptionAsync(() => repo.DeleteByIdAsync(999));
+        var exception = await Record.ExceptionAsync(() => repo.DeleteByIdAsync(999, CancellationToken));
 
         Assert.Null(exception);
     }
@@ -253,7 +255,7 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
 
-        var count = await repo.CountAsync();
+        var count = await repo.CountAsync(CancellationToken);
 
         Assert.Equal(0, count);
     }
@@ -262,10 +264,10 @@ public class InMemoryUserRepositoryTests
     public async Task CountAsync_ShouldReturnCorrectCount()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser("u1", "u1@example.com"));
-        await repo.AddAsync(CreateUser("u2", "u2@example.com"));
+        await repo.AddAsync(CreateUser("u1", "u1@example.com"), CancellationToken);
+        await repo.AddAsync(CreateUser("u2", "u2@example.com"), CancellationToken);
 
-        var count = await repo.CountAsync();
+        var count = await repo.CountAsync(CancellationToken);
 
         Assert.Equal(2, count);
     }
@@ -276,9 +278,9 @@ public class InMemoryUserRepositoryTests
     public async Task AnyAsync_ShouldReturnTrue_WhenMatchExists()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser("alice", "alice@example.com"));
+        await repo.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
 
-        var result = await repo.AnyAsync(u => u.Username == "alice");
+        var result = await repo.AnyAsync(u => u.Username == "alice", CancellationToken);
 
         Assert.True(result);
     }
@@ -287,9 +289,9 @@ public class InMemoryUserRepositoryTests
     public async Task AnyAsync_ShouldReturnFalse_WhenNoMatch()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser());
+        await repo.AddAsync(CreateUser(), CancellationToken);
 
-        var result = await repo.AnyAsync(u => u.Username == "nonexistent");
+        var result = await repo.AnyAsync(u => u.Username == "nonexistent", CancellationToken);
 
         Assert.False(result);
     }
@@ -300,9 +302,9 @@ public class InMemoryUserRepositoryTests
     public async Task GetByUsernameAsync_ShouldReturnUser_WhenExists()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser("alice", "alice@example.com"));
+        await repo.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
 
-        var result = await repo.GetByUsernameAsync("alice");
+        var result = await repo.GetByUsernameAsync("alice", CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal("alice", result.Username);
@@ -313,7 +315,7 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
 
-        var result = await repo.GetByUsernameAsync("nonexistent");
+        var result = await repo.GetByUsernameAsync("nonexistent", CancellationToken);
 
         Assert.Null(result);
     }
@@ -324,9 +326,9 @@ public class InMemoryUserRepositoryTests
     public async Task GetByEmailAsync_ShouldReturnUser_WhenExists()
     {
         var repo = new InMemoryUserRepository();
-        await repo.AddAsync(CreateUser("alice", "alice@example.com"));
+        await repo.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
 
-        var result = await repo.GetByEmailAsync("alice@example.com");
+        var result = await repo.GetByEmailAsync("alice@example.com", CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal("alice@example.com", result.Email);
@@ -337,7 +339,7 @@ public class InMemoryUserRepositoryTests
     {
         var repo = new InMemoryUserRepository();
 
-        var result = await repo.GetByEmailAsync("nobody@example.com");
+        var result = await repo.GetByEmailAsync("nobody@example.com", CancellationToken);
 
         Assert.Null(result);
     }

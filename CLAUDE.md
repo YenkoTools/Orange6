@@ -11,19 +11,19 @@ Orange6 is a full-stack web application with a .NET 10 Azure Functions backend (
 ### Service (run from repo root)
 
 ```bash
-dotnet restore Service/Service.sln
-dotnet build Service/Service.sln
-dotnet build Service/Service.sln --configuration Release
-dotnet test Service/Service.sln --configuration Release --verbosity normal
+dotnet restore Service/Service.slnx
+dotnet build Service/Service.slnx
+dotnet build Service/Service.slnx --configuration Release
+dotnet test Service/Service.slnx --configuration Release --verbosity normal
 
 # Run a single test project
-dotnet test Service/Tests/Api.Tests/Api.Tests.csproj
+dotnet test Service/tests/Api.Tests/Api.Tests.csproj
 
 # Run the API locally (port 7001)
-cd Service/Api && func host start --port 7001
+cd Service/src/Api && func host start --port 7001
 
 # Publish for deployment
-dotnet publish Service/Api/Api.csproj --configuration Release --output publish/api
+dotnet publish Service/src/Api/Api.csproj --configuration Release --output publish/api
 ```
 
 ### Client (run from `Client/`)
@@ -71,5 +71,5 @@ Astro 5 with React 19 islands and Tailwind CSS v4. Pages in `Client/src/pages/`,
 - All handlers return `Result` or `Result<T>` — never throw for expected errors
 - `Result.IsNotFound` is detected by `Error.Code` starting with `"NotFound"` — follow this convention for new not-found errors
 - Pipeline behaviors are order-sensitive; new behaviors are appended after existing ones in `ServiceCollectionExtensions`
-- Tests use xUnit + NSubstitute; test projects mirror the source project they cover under `Service/Tests/`
+- Tests use xUnit + NSubstitute; test projects mirror the source project they cover under `Service/tests/`
 - .NET SDK version is pinned to `10.0.x` via `Service/global.json`
