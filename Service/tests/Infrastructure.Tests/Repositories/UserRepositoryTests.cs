@@ -12,6 +12,8 @@ namespace Infrastructure.Tests.Repositories;
 /// </summary>
 public class UserRepositoryTests : IDisposable
 {
+    private static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
     private readonly string _dbPath;
     private readonly UserRepository _repository;
 
@@ -44,7 +46,7 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task AddAsync_ShouldAssignId()
     {
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
 
         Assert.True(user.Id > 0);
     }
@@ -52,8 +54,8 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task AddAsync_ShouldAssignIncrementalId()
     {
-        var user1 = await _repository.AddAsync(CreateUser("u1", "u1@example.com"));
-        var user2 = await _repository.AddAsync(CreateUser("u2", "u2@example.com"));
+        var user1 = await _repository.AddAsync(CreateUser("u1", "u1@example.com"), CancellationToken);
+        var user2 = await _repository.AddAsync(CreateUser("u2", "u2@example.com"), CancellationToken);
 
         Assert.True(user2.Id > user1.Id);
     }
@@ -62,7 +64,7 @@ public class UserRepositoryTests : IDisposable
     public async Task AddAsync_ShouldSetCreatedAt()
     {
         var before = DateTime.UtcNow;
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
 
         Assert.True(user.CreatedAt >= before);
     }
@@ -71,7 +73,7 @@ public class UserRepositoryTests : IDisposable
     public async Task AddAsync_ShouldSetUpdatedAt()
     {
         var before = DateTime.UtcNow;
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
 
         Assert.True(user.UpdatedAt >= before);
     }
@@ -80,9 +82,9 @@ public class UserRepositoryTests : IDisposable
     public async Task AddAsync_ShouldStoreUser()
     {
         var user = CreateUser();
-        await _repository.AddAsync(user);
+        await _repository.AddAsync(user, CancellationToken);
 
-        var result = await _repository.GetByIdAsync(user.Id);
+        var result = await _repository.GetByIdAsync(user.Id, CancellationToken);
         Assert.NotNull(result);
         Assert.Equal(user.Username, result.Username);
     }
@@ -92,9 +94,9 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetByIdAsync_ShouldReturnUser_WhenExists()
     {
-        var added = await _repository.AddAsync(CreateUser());
+        var added = await _repository.AddAsync(CreateUser(), CancellationToken);
 
-        var result = await _repository.GetByIdAsync(added.Id);
+        var result = await _repository.GetByIdAsync(added.Id, CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(added.Id, result.Id);
@@ -103,7 +105,7 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetByIdAsync_ShouldReturnNull_WhenNotFound()
     {
-        var result = await _repository.GetByIdAsync(999);
+        var result = await _repository.GetByIdAsync(999, CancellationToken);
 
         Assert.Null(result);
     }
@@ -113,10 +115,10 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllUsers()
     {
-        await _repository.AddAsync(CreateUser("u1", "u1@example.com"));
-        await _repository.AddAsync(CreateUser("u2", "u2@example.com"));
+        await _repository.AddAsync(CreateUser("u1", "u1@example.com"), CancellationToken);
+        await _repository.AddAsync(CreateUser("u2", "u2@example.com"), CancellationToken);
 
-        var result = await _repository.GetAllAsync();
+        var result = await _repository.GetAllAsync(CancellationToken);
 
         Assert.Equal(SeedCount + 2, result.Count());
     }
@@ -124,7 +126,7 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetAllAsync_ShouldReturnSeedUsers_WhenNoUsersAdded()
     {
-        var result = await _repository.GetAllAsync();
+        var result = await _repository.GetAllAsync(CancellationToken);
 
         Assert.Equal(SeedCount, result.Count());
     }
@@ -134,10 +136,10 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task FindAsync_ShouldReturnMatchingUsers()
     {
-        await _repository.AddAsync(CreateUser("alice", "alice@example.com"));
-        await _repository.AddAsync(CreateUser("bob", "bob@example.com"));
+        await _repository.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
+        await _repository.AddAsync(CreateUser("bob", "bob@example.com"), CancellationToken);
 
-        var result = await _repository.FindAsync(u => u.Username == "alice");
+        var result = await _repository.FindAsync(u => u.Username == "alice", CancellationToken);
 
         Assert.Single(result);
         Assert.Equal("alice", result.First().Username);
@@ -146,9 +148,9 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task FindAsync_ShouldReturnEmpty_WhenNoMatch()
     {
-        await _repository.AddAsync(CreateUser());
+        await _repository.AddAsync(CreateUser(), CancellationToken);
 
-        var result = await _repository.FindAsync(u => u.Username == "nonexistent");
+        var result = await _repository.FindAsync(u => u.Username == "nonexistent", CancellationToken);
 
         Assert.Empty(result);
     }
@@ -159,9 +161,9 @@ public class UserRepositoryTests : IDisposable
     public async Task GetPagedAsync_ShouldReturnCorrectItems()
     {
         for (int i = 1; i <= 5; i++)
-            await _repository.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"));
+            await _repository.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"), CancellationToken);
 
-        var result = await _repository.GetPagedAsync(page: 1, pageSize: 3);
+        var result = await _repository.GetPagedAsync(page: 1, pageSize: 3, CancellationToken);
 
         Assert.Equal(3, result.Items.Count());
     }
@@ -170,9 +172,9 @@ public class UserRepositoryTests : IDisposable
     public async Task GetPagedAsync_ShouldReturnCorrectTotalCount()
     {
         for (int i = 1; i <= 5; i++)
-            await _repository.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"));
+            await _repository.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"), CancellationToken);
 
-        var result = await _repository.GetPagedAsync(page: 1, pageSize: 3);
+        var result = await _repository.GetPagedAsync(page: 1, pageSize: 3, CancellationToken);
 
         Assert.Equal(SeedCount + 5, result.TotalCount);
     }
@@ -181,9 +183,9 @@ public class UserRepositoryTests : IDisposable
     public async Task GetPagedAsync_ShouldReturnSecondPage()
     {
         for (int i = 1; i <= 5; i++)
-            await _repository.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"));
+            await _repository.AddAsync(CreateUser($"user{i}", $"user{i}@example.com"), CancellationToken);
 
-        var result = await _repository.GetPagedAsync(page: 2, pageSize: 3);
+        var result = await _repository.GetPagedAsync(page: 2, pageSize: 3, CancellationToken);
 
         Assert.Equal(3, result.Items.Count());
         Assert.Equal(2, result.PageNumber);
@@ -194,12 +196,12 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task UpdateAsync_ShouldUpdateUser()
     {
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
         user.FirstName = "Updated";
 
-        await _repository.UpdateAsync(user);
+        await _repository.UpdateAsync(user, CancellationToken);
 
-        var result = await _repository.GetByIdAsync(user.Id);
+        var result = await _repository.GetByIdAsync(user.Id, CancellationToken);
         Assert.NotNull(result);
         Assert.Equal("Updated", result.FirstName);
     }
@@ -207,13 +209,13 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task UpdateAsync_ShouldSetUpdatedAt()
     {
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
         var before = DateTime.UtcNow;
         user.FirstName = "Modified";
 
-        await _repository.UpdateAsync(user);
+        await _repository.UpdateAsync(user, CancellationToken);
 
-        var result = await _repository.GetByIdAsync(user.Id);
+        var result = await _repository.GetByIdAsync(user.Id, CancellationToken);
         Assert.NotNull(result);
         Assert.True(result.UpdatedAt >= before);
     }
@@ -223,7 +225,7 @@ public class UserRepositoryTests : IDisposable
     {
         var nonExistentUser = new User { Id = 999, Username = "ghost", Email = "ghost@example.com", FirstName = "Ghost", LastName = "User" };
 
-        var exception = await Record.ExceptionAsync(() => _repository.UpdateAsync(nonExistentUser));
+        var exception = await Record.ExceptionAsync(() => _repository.UpdateAsync(nonExistentUser, CancellationToken));
 
         Assert.Null(exception);
     }
@@ -233,11 +235,11 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task DeleteAsync_ShouldRemoveUser()
     {
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
 
-        await _repository.DeleteAsync(user);
+        await _repository.DeleteAsync(user, CancellationToken);
 
-        var result = await _repository.GetByIdAsync(user.Id);
+        var result = await _repository.GetByIdAsync(user.Id, CancellationToken);
         Assert.Null(result);
     }
 
@@ -246,18 +248,18 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task DeleteByIdAsync_ShouldRemoveUser_WhenExists()
     {
-        var user = await _repository.AddAsync(CreateUser());
+        var user = await _repository.AddAsync(CreateUser(), CancellationToken);
 
-        await _repository.DeleteByIdAsync(user.Id);
+        await _repository.DeleteByIdAsync(user.Id, CancellationToken);
 
-        var result = await _repository.GetByIdAsync(user.Id);
+        var result = await _repository.GetByIdAsync(user.Id, CancellationToken);
         Assert.Null(result);
     }
 
     [Fact]
     public async Task DeleteByIdAsync_ShouldNotThrow_WhenUserNotFound()
     {
-        var exception = await Record.ExceptionAsync(() => _repository.DeleteByIdAsync(999));
+        var exception = await Record.ExceptionAsync(() => _repository.DeleteByIdAsync(999, CancellationToken));
 
         Assert.Null(exception);
     }
@@ -267,7 +269,7 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task CountAsync_ShouldReturnSeedCount_WhenNoUsersAdded()
     {
-        var count = await _repository.CountAsync();
+        var count = await _repository.CountAsync(CancellationToken);
 
         Assert.Equal(SeedCount, count);
     }
@@ -275,10 +277,10 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task CountAsync_ShouldReturnCorrectCount()
     {
-        await _repository.AddAsync(CreateUser("u1", "u1@example.com"));
-        await _repository.AddAsync(CreateUser("u2", "u2@example.com"));
+        await _repository.AddAsync(CreateUser("u1", "u1@example.com"), CancellationToken);
+        await _repository.AddAsync(CreateUser("u2", "u2@example.com"), CancellationToken);
 
-        var count = await _repository.CountAsync();
+        var count = await _repository.CountAsync(CancellationToken);
 
         Assert.Equal(SeedCount + 2, count);
     }
@@ -288,9 +290,9 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task AnyAsync_ShouldReturnTrue_WhenMatchExists()
     {
-        await _repository.AddAsync(CreateUser("alice", "alice@example.com"));
+        await _repository.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
 
-        var result = await _repository.AnyAsync(u => u.Username == "alice");
+        var result = await _repository.AnyAsync(u => u.Username == "alice", CancellationToken);
 
         Assert.True(result);
     }
@@ -298,9 +300,9 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task AnyAsync_ShouldReturnFalse_WhenNoMatch()
     {
-        await _repository.AddAsync(CreateUser());
+        await _repository.AddAsync(CreateUser(), CancellationToken);
 
-        var result = await _repository.AnyAsync(u => u.Username == "nonexistent");
+        var result = await _repository.AnyAsync(u => u.Username == "nonexistent", CancellationToken);
 
         Assert.False(result);
     }
@@ -310,9 +312,9 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetByUsernameAsync_ShouldReturnUser_WhenExists()
     {
-        await _repository.AddAsync(CreateUser("alice", "alice@example.com"));
+        await _repository.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
 
-        var result = await _repository.GetByUsernameAsync("alice");
+        var result = await _repository.GetByUsernameAsync("alice", CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal("alice", result.Username);
@@ -321,7 +323,7 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetByUsernameAsync_ShouldReturnNull_WhenNotFound()
     {
-        var result = await _repository.GetByUsernameAsync("nonexistent");
+        var result = await _repository.GetByUsernameAsync("nonexistent", CancellationToken);
 
         Assert.Null(result);
     }
@@ -331,9 +333,9 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetByEmailAsync_ShouldReturnUser_WhenExists()
     {
-        await _repository.AddAsync(CreateUser("alice", "alice@example.com"));
+        await _repository.AddAsync(CreateUser("alice", "alice@example.com"), CancellationToken);
 
-        var result = await _repository.GetByEmailAsync("alice@example.com");
+        var result = await _repository.GetByEmailAsync("alice@example.com", CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal("alice@example.com", result.Email);
@@ -342,7 +344,7 @@ public class UserRepositoryTests : IDisposable
     [Fact]
     public async Task GetByEmailAsync_ShouldReturnNull_WhenNotFound()
     {
-        var result = await _repository.GetByEmailAsync("nobody@example.com");
+        var result = await _repository.GetByEmailAsync("nobody@example.com", CancellationToken);
 
         Assert.Null(result);
     }
