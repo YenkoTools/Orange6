@@ -5,7 +5,10 @@
     "**/*"
   ],
   "exclude": [
-    "dist"
+    "dist",
+    "eslint.config.js",
+    "playwright.config.ts",
+    "vitest.config.*"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
