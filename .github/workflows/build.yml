@@ -73,10 +73,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
           cache-dependency-path: Client/package-lock.json
 
@@ -86,7 +86,7 @@ jobs:
 
       # Type-check via astro check (catches Astro + TypeScript errors)
       - name: Type check
-        run: npx astro check
+        run: node_modules/.bin/astro check
         working-directory: Client
 
       - name: Build

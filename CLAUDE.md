@@ -33,7 +33,7 @@ npm install
 npm run dev        # dev server at localhost:5001
 npm run build      # production build to Client/dist
 npm run preview
-npx astro check    # type checking
+node_modules/.bin/astro check   # type checking (npx triggers broken auto-install on Node 24)
 ```
 
 ### Run both together (recommended)
