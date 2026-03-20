@@ -84,6 +84,10 @@ jobs:
         run: npm ci
         working-directory: Client
 
+      - name: Lint
+        run: npm run lint
+        working-directory: Client
+
       # Type-check via astro check (catches Astro + TypeScript errors)
       - name: Type check
         run: node_modules/.bin/astro check

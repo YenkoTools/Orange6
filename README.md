@@ -18,7 +18,7 @@ Orange6/
 │   ├── Application/          # Use cases, commands, queries, and behaviors
 │   ├── Domain/               # Entities, value objects, and domain errors
 │   ├── Infrastructure/       # Repositories and external services
-│   └── Service.sln           # Solution file
+│   └── Service.slnx          # Solution file
 └── Client/                   # Astro + React + Tailwind CSS frontend
 ```
 
@@ -86,10 +86,10 @@ The `Service/Infrastructure` project implements the interfaces defined in `Appli
 
 ## Client
 
-The `Client` project is a static frontend built with [Astro 5](https://astro.build), [React](https://react.dev), and [Tailwind CSS v4](https://tailwindcss.com). It is configured to work alongside the Azure Functions API using the [Azure Static Web Apps CLI](https://azure.github.io/static-web-apps-cli/).
+The `Client` project is a static frontend built with [Astro 6](https://astro.build), [React](https://react.dev), and [Tailwind CSS v4](https://tailwindcss.com). It is configured to work alongside the Azure Functions API using the [Azure Static Web Apps CLI](https://azure.github.io/static-web-apps-cli/).
 
 **Key technologies:**
-- Astro 5
+- Astro 6
 - React 19
 - Tailwind CSS v4
 - SWA CLI (`swa-cli.config.json`)
@@ -99,7 +99,7 @@ The `Client` project is a static frontend built with [Astro 5](https://astro.bui
 ## Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10)
-- [Node.js 20+](https://nodejs.org) and npm
+- [Node.js 22+](https://nodejs.org) and npm
 
 ### Install Azure Functions Core Tools
 
@@ -145,25 +145,98 @@ swa --version
 
 ---
 
+## Code Quality & Static Analysis
+
+### Service — SonarAnalyzer (.NET)
+
+The Service uses [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) which runs automatically as part of every build. There is nothing extra to install — it is included as a NuGet package and the compiler surfaces findings as warnings in the build output.
+
+**Run analysis:**
+```bash
+# Findings appear inline during any build
+dotnet build Service/Service.slnx
+
+# Run with full verbosity to see all analyzer diagnostics
+dotnet build Service/Service.slnx --verbosity normal 2>&1 | grep -E "warning S[0-9]+"
+```
+
+**How to read the output:**
+
+Findings appear as standard compiler warnings with an `S`-prefixed rule code:
+```
+warning S6667: Logging in a catch clause should pass the caught exception as a parameter.
+warning S1075: Refactor your code not to use hardcoded absolute paths or URIs.
+```
+
+Each rule code links to the [SonarSource rule catalog](https://rules.sonarsource.com/csharp) where the rationale and compliant/non-compliant examples are documented.
+
+**Suppressing a finding** when it is a known false positive:
+```csharp
+#pragma warning disable S1075 // reason why this suppression is intentional
+Url = new Uri("https://opensource.org/licenses/MIT"),
+#pragma warning restore S1075
+```
+
+---
+
+### Client — ESLint with SonarJS
+
+The Client uses ESLint with three plugins configured in [`Client/eslint.config.js`](Client/eslint.config.js):
+
+| Plugin | What it detects |
+|---|---|
+| `@eslint/js` + `typescript-eslint` | Undeclared variables, unsafe `any`, unused imports, type misuse |
+| `eslint-plugin-sonarjs` | Cognitive complexity, duplicate code, always-true conditions — the same S-rule family as the .NET analyser |
+| `eslint-plugin-astro` | Invalid Astro component syntax, prop misuse, accessibility issues in `.astro` files |
+
+**Run analysis (from `Client/`):**
+```bash
+# Report all findings
+npm run lint
+
+# Auto-fix safe violations (formatting, simple rules)
+npm run lint:fix
+
+# Lint a single file
+node_modules/.bin/eslint src/pages/index.astro
+```
+
+**How to read the output:**
+
+Each finding shows the file, line, rule ID, and description:
+```
+src/components/UserList.tsx
+  14:5  warning  Cognitive Complexity of this function is too high  sonarjs/cognitive-complexity
+  27:3  error    Unexpected any. Specify a different type           @typescript-eslint/no-explicit-any
+```
+
+**Suppressing a finding** when it is a known false positive:
+```ts
+// eslint-disable-next-line sonarjs/cognitive-complexity
+function complexButNecessary() {
+```
+
+---
+
 ## Build, Test & Package
 
 ### Service
 
 ```bash
 # Restore dependencies
-dotnet restore Service/Service.sln
+dotnet restore Service/Service.slnx
 
 # Build (Debug)
-dotnet build Service/Service.sln
+dotnet build Service/Service.slnx
 
 # Build (Release)
-dotnet build Service/Service.sln --configuration Release
+dotnet build Service/Service.slnx --configuration Release
 
 # Run tests
-dotnet test Service/Service.sln --configuration Release --verbosity normal
+dotnet test Service/Service.slnx --configuration Release --verbosity normal
 
 # Publish Api (Release) — outputs to publish/api
-dotnet publish Service/Api/Api.csproj --configuration Release --output publish/api
+dotnet publish Service/src/Api/Api.csproj --configuration Release --output publish/api
 ```
 
 ### Client
@@ -189,7 +262,7 @@ The API dev server runs on `http://localhost:7001` and the client dev server run
 ### Run the Service Api
 
 ```bash
-cd Service/Api
+cd Service/src/Api
 func host start --port 7001
 ```
 
@@ -213,17 +286,18 @@ swa start
 
 ## GitHub Action
 
-The workflow is defined in [.github/workflows/azure-static-web-apps.yml](.github/workflows/azure-static-web-apps.yml).
+The workflow is defined in [.github/workflows/build.yml](.github/workflows/build.yml).
 
-**Trigger:** Manual only (`workflow_dispatch`). Run it from the **Actions** tab → **Run workflow**, choosing a target environment (`production` or `staging`).
+**Trigger:** Manual only (`workflow_dispatch`). Run it from the **Actions** tab → **Run workflow**, choosing a target environment (`production`, `staging`, or `testing`).
 
 **Jobs:**
 
 | Job | Description |
 |---|---|
-| **Build & Test Service** | Sets up .NET 10, restores dependencies from `Service/Service.sln`, builds in Release mode, runs any test projects found, and publishes the Functions app (`Service/Api`) to a staging artifact. |
-| **Build Client** | Sets up Node.js 20, installs dependencies via `npm ci`, runs `astro check` for type checking, and builds the Astro site to a staging artifact. |
-| **Deploy to Azure SWA** | Runs only after both build jobs succeed. Downloads the pre-built client and API artifacts and deploys them to Azure Static Web Apps using the `azure/static-web-apps-deploy` action. Both the Oryx client and API build steps are skipped since the artifacts are already built. |
+| **Build & Test Api** | Sets up .NET 10, restores and builds in Release mode, runs all test projects, and publishes the Functions app to a staging artifact. SonarAnalyzer runs automatically as part of the build and will fail the job on any error-level findings. |
+| **Build Client** | Sets up Node.js 22, installs dependencies via `npm ci`, runs ESLint (`npm run lint`), runs `astro check` for TypeScript type checking, and builds the Astro site to a staging artifact. |
+| **Approve Deployment** | Manual approval gate — configure required reviewers in **Settings → Environments**. |
+| **Deploy to Azure SWA** | Runs only after approval. Downloads the pre-built artifacts and deploys to Azure Static Web Apps. Both Oryx build steps are skipped since artifacts are already built. |
 
 **Required secret:**
 
